@@ -1,0 +1,7 @@
+B:GNAB:A2M:chr12:9220260:9268825:-:code_potential_somatic	B:GNAB:NCOR2:chr12:124808961:125052135:-:code_potential_somatic	0.43	289	6.6	9.8	0.0	0	-0.0	0	-0.0	115540136
+B:GNAB:A2M:chr12:9220260:9268825:-:code_potential_somatic	B:GNAB:ROR2:chr9:94325373:94712444:-:code_potential_somatic	0.45	289	6.6	9.8	0.0	0	-0.0	0	-0.0	500000000
+B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:CLIP1:chr12:122755979:122907179:-:code_potential_somatic	0.53	289	7.8	9.8	0.0	0	-0.0	0	-0.0	113716382
+B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:KLHL9:chr9:21329670:21335379:-:code_potential_somatic	0.53	289	6.1	9.8	0.0	0	-0.0	0	-0.0	500000000
+B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:PIK3R4:chr3:130397779:130465673:-:code_potential_somatic	0.55	289	7.0	9.8	0.0	0	-0.0	0	-0.0	500000000
+B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:SLC6A2:chr16:55689516:55740104:+:code_potential_somatic	0.55	289	7.5	9.8	0.0	0	-0.0	0	-0.0	500000000
+B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:TRAPPC10:chr21:45432200:45526433:+:code_potential_somatic	0.49	289	6.8	9.8	0.0	0	-0.0	0	-0.0	500000000
