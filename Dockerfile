@@ -33,12 +33,13 @@ RUN rm /tmp/titan.zip
 RUN tar -xvzf /tmp/cassandra.tar.gz
 RUN rm /tmp/cassandra.tar.gz
 
-COPY /main/conf/rexster-cassandra-es.xml /opt/$TITAN_VER/conf/
-COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
-COPY /data/filenames.tsv /opt/$TITAN_VER/
-COPY /data/stad.all.16jan15.TP.pwpv /opt/$TITAN_VER/
-
 WORKDIR /opt/$TITAN_VER/
+
+COPY /main/conf/rexster-cassandra-es.xml /conf/
+COPY /main/groovy/PWLoad.groovy /
+COPY /data/filenames.tsv /
+COPY /data/stad.all.16jan15.TP.pwpv /
+COPY /main/html/* /html/
 
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan
