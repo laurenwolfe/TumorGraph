@@ -15,6 +15,10 @@ RUN apt-get -y dist-upgrade
 RUN apt-get install -y wget unzip
 
 RUN apt-get install -y nginx
+RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+RUN mkdir /etc/nginx/ssl
+ADD default /etc/nginx/sites-available/default
+
 
 RUN echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
 RUN apt-get install -y oracle-java7-installer wget unzip
@@ -29,9 +33,6 @@ RUN rm /tmp/titan.zip
 RUN tar -xvzf /tmp/cassandra.tar.gz
 RUN rm /tmp/cassandra.tar.gz
 
-#RUN tar -xvzf /tmp/nginx-1.8.0.tar.gz
-#RUN rm /tmp/nginx-1.8.0.tar.gz
-
 COPY /main/conf/rexster-cassandra-es.xml /opt/$TITAN_VER/conf/
 COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
 COPY /data/filenames.tsv /opt/$TITAN_VER/
@@ -42,7 +43,7 @@ WORKDIR /opt/$TITAN_VER/
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan
 
-#RUN nginx
+RUN nginx
 RUN bin/titan.sh start
 
 EXPOSE 80 8182
