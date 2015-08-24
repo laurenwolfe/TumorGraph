@@ -1,5 +1,5 @@
 server {
-    root /var/www;
+    root /var/www/html;
     index index.html index.htm;
 
     # Make site accessible from http://localhost/
