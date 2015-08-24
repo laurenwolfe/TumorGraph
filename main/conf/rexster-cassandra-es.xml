@@ -95,6 +95,7 @@
             <graph-read-only>false</graph-read-only>
             <properties>
                 <storage.backend>cassandra</storage.backend>
+                <storage.hostname>192.168.59.103</storage.hostname>
                 <index.search.backend>elasticsearch</index.search.backend>
                 <storage.buffer-size>100</storage.buffer-size>
             </properties>

@@ -1,0 +1,73 @@
+<script src="../keylines/js/keylines.js"></script>
+<script src="../keylines/js/jquery-2.1.4.min.js"></script>
+<link rel=" stylesheet" type="text/css" href="../keylines/css/keylines.css">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div id="kl" style="width: 818 px; height: 586px;"></div>
+<script>
+    window.onload = function () {
+        KeyLines.paths({
+            assets: '../keylines/assets/',
+            flash: {
+                swf: '../keylines/swf/keylines.swf',
+                swfObject: '../keylines/js/swfobject.js',
+                expressInstall: '../keylines/swf/expressInstall.swf'
+            }
+        });
+        KeyLines.create('kl', function(err, chart) {
+            $.ajax({
+                type: "GET",
+                url: rexsterURL+query,
+                dataType: "json",
+                success: function (json) {
+                    fromTitanToKeyLines(json, callback);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+    }
+
+    function fromTitanToKeyLines(item, callback) {
+        var klItems = [];
+
+        $.each(items, function (i, item) {
+            var klItem;
+            if(item._type === 'vertex') {
+                klItem = createNode(item);
+            } else {
+                klItem = createLink(item);
+            }
+            klItems.push(klItem);
+        });
+
+        chart.expand(klItems, {tidy: true, animate: true}, callback);
+
+    }
+
+    function createNode(item) {
+        var node = {};
+
+        node.id = item._idl
+
+        return node;
+    }
+
+    function createLink(item) {
+        var link = {};
+
+        link.id = item._id;
+
+        return link;
+    }
+
+</script>
+</body>
+</html>
