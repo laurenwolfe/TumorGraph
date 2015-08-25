@@ -1,0 +1,32 @@
+<script src="/keylines/js/keylines.js"></script>
+<script src="/keylines/js/jquery-2.1.4.min.js"></script>
+<link rel=" stylesheet" type="text/css" href="/keylines/css/keylines.css">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<h1>THIS IS REAL LIFE</h1>
+<div id="kl" style="width: 818 px; height: 586px;"></div>
+<script>
+    window.onload = function () {
+        KeyLines.paths({
+            assets: '/keylines/assets/',
+            flash: {
+                swf: '/keylines/swf/keylines.swf',
+                swfObject: '/keylines/js/swfobject.js',
+                expressInstall: '/keylines/swf/expressInstall.swf'
+            }
+        });
+        KeyLines.create('kl', function(err, chart) {
+            chart.load({
+                type: 'LinkChart',
+                items: [{id:'id1', type: 'node', x:150, y: 150, t:'Hello World!'}]
+            });
+        });
+    };
+</script>
+</body>
+</html>
