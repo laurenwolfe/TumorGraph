@@ -14,11 +14,11 @@
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
-                <max-size>8</max-size>
+                <max-size>128</max-size>
             </worker>
             <kernal>
                 <core-size>4</core-size>
-                <max-size>4</max-size>
+                <max-size>32</max-size>
             </kernal>
         </thread-pool>
         <io-strategy>leader-follower</io-strategy>

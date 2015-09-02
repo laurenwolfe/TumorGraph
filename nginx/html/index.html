@@ -8,25 +8,76 @@
     <meta charset="UTF-8">
     <title></title>
 </head>
-<h1>THIS IS REAL LIFE</h1>
+<body>
 <div id="kl" style="width: 818 px; height: 586px;"></div>
 <script>
+    var chart;
+    var rexsterURL = "http://glados49:8182/graphs/tumorgraph/";
+    var startingGene = 'TG';
+    var queryStr = "vertices?key=name&value=" + startingGene;
+
+    var path = "/keylines/";
+
     window.onload = function () {
         KeyLines.paths({
-            assets: '/keylines/assets/',
-            flash: {
-                swf: '/keylines/swf/keylines.swf',
-                swfObject: '/keylines/js/swfobject.js',
-                expressInstall: '/keylines/swf/expressInstall.swf'
+            assets: path + 'assets/',
+            flash:{
+                swf: path + 'swf/keylines.swf',
+                swfObject: path + 'js/swfobject.js',
+                expressInstall: path + 'swf/expressInstall.swf'
             }
         });
         KeyLines.create('kl', function(err, chart) {
-            chart.load({
-                type: 'LinkChart',
-                items: [{id:'id1', type: 'node', x:150, y: 150, t:'Hello World!'}]
+            $.ajax({
+               type: "GET",
+                url: rexsterURL + queryStr,
+                dataType: "json",
+                contentType: "application/json",
+                success: function (json) {
+                    ParseJSONData(json.results, chart);
+                }
             });
         });
     };
+
+    function ParseJSONData(items, callback) {
+        var klItems = [];
+        $.each(items, function (i, item) {
+            var klItem;
+
+            if(item._type === 'vertex') {
+                klItem = createNode(item);
+            } else {
+                klItem = createLink(item);
+            }
+
+            klItems.push(klItem);
+            //************************************
+        });
+        chart.expand(klItems, {tidy: true, animate: true}, callback);
+    }
+
+    function createNode(item){
+        var node = {
+            id: item._id,
+            type: 'node',
+            t: item.name,
+            x: 150,
+            y: 150,
+            c: 'rgb(255, 0, 0)'
+        };
+
+        return node;
+    }
+
+    function createLink(item){
+        var link = {};
+        // add an id to the node using a custom ID (not the Titan internal one)
+        link.id = item._id;
+
+        return link;
+    }
+
 </script>
 </body>
 </html>
