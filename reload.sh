@@ -1,5 +1,5 @@
 #!/bin/sh
-docker stop keylines
-docker rm keylines
-docker build -t lulumialu/keylines nginx/
-docker run -d -p 8080:80 --name keylines lulumialu/keylines
+docker stop visualize
+docker rm visualize
+docker build -t lulumialu/visualize nginx/
+docker run -d -p 8080:80 --name visualize lulumialu/visualize

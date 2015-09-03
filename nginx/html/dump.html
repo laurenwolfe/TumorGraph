@@ -1,0 +1,43 @@
+<div id="popover" style="display: none; position: absolute; min-width: 250px; pointer-events: none;" class="popover right">
+    <h2 id="popoverTitle" class="popover-title"></h2>
+    <div class="popover-content">
+        <script id="popoverNodeTemplate" type="text/template">
+            <table class="table table-bordered">
+                <tbody id="content">
+                <tr>
+                    <td>ObjectID: </td>
+                    <td>{{objectID}}</td>
+                </tr>
+                <tr>
+                    <td>Start: </td>
+                    <td>{{start}}</td>
+                </tr>
+                <tr>
+                    <td>Name: </td>
+                    <td>{{name}}</td>
+                </tr>
+                <tr>
+                    <td>Strand: </td>
+                    <td>{{strand}}</td>
+                </tr>
+                <tr>
+                    <td>End: </td>
+                    <td>{{end}}</td>
+                </tr>
+                <tr>
+                    <td>Chr: </td>
+                    <td>{{chr}}</td>
+                </tr>
+                <tr>
+                    <td>Tumor type: </td>
+                    <td>{{tumor_type}}</td>
+                </tr>
+                <tr>
+                    <td>Version: </td>
+                    <td>{{version}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </script>
+    </div>
+</div>

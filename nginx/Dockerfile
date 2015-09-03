@@ -7,7 +7,7 @@ RUN apt-get install -y nginx
 RUN apt-get install -y nano
 
 COPY /html/ /usr/share/nginx/html/
-COPY /keylines/ /usr/share/nginx/html/keylines/
+COPY /js/ /usr/share/nginx/html/js/
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
