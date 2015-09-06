@@ -2,7 +2,6 @@
             setProperty("storage.backend", "cassandra")
             setProperty("storage.hostname", "127.0.0.1")
             setProperty("storage.batch-loading", true)
-            setProperty("ids.block-size", 10000000)
 
     }}
 
@@ -57,13 +56,12 @@
     //mgmt.buildIndex('byObjectId', Vertex.class).addKey(objectId).unique().buildCompositeIndex()
     mgmt.commit()
 
-    bg = new BatchGraph(g, VertexIDType.STRING, 1000);
+    bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
     //For testing, output count
     x = 0
     y = 0
-
-    idList = [];
+    idList = []
 
 
     //Filename will need to be looped here from another file containing filenames and perhaps tumor 
@@ -116,9 +114,8 @@
 
             //This is for filtering by annotation type, currently both bioentities need to be code_potential_somatic for the 
             //code block to execute.
-//            if(annotation1 == "code_potential_somatic" && annotation2 == "code_potential_somatic") {
 
-                //Generate objectIDs by concatenating the tumor type, feature type and gene name
+            //Generate objectIDs by concatenating the tumor type, feature type and gene name
             switch(featureType1) {
                 case "GEXB":
                     objectID1 =  tumor_type + ':Gene:' + name1
@@ -182,6 +179,7 @@
                     !end1 ?: v1.setProperty("end", end1)
                     !strand1 ?: v1.setProperty("strand", strand1)
 
+                    idList.add(v1.getId());
                     y++
 
                 } else {
@@ -202,6 +200,7 @@
                     !end2 ?: v2.setProperty("end", end2)
                     !strand2 ?: v2.setProperty("strand", strand2)
 
+                    idList.add(v2.getId());
                     y++
 
                 } else {
@@ -222,10 +221,12 @@
                 edge.setProperty("feature_types", featureType1 + ':' + featureType2)
 
                 x++
-//            }
         })
         println x + " edges generated"
         println y + " vertices generated"
+        println "vertex count: " + idList.size()
+        uniqueList = idList.unique()
+        println "unique values: " + uniqueList.size()
     })
 
     g.commit()

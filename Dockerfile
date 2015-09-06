@@ -30,6 +30,7 @@ COPY /main/conf/rexster-cassandra-es.xml /opt/$TITAN_VER/conf/
 COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
 COPY /data/filenames.tsv /opt/$TITAN_VER/
 COPY /data/stad.all.16jan15.TP.pwpv /opt/$TITAN_VER/
+COPY build.sh /opt/$TITAN_VER/
 
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan

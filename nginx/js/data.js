@@ -3,11 +3,48 @@ var rexsterURL = "http://glados49:8182/graphs/tumorgraph/";
 
 var id = '41472';
 var key = "objectID";
-var val = "stad Gene TG";
+var val = "stad:Gene:TG";
 
 var graphJSON;
 var vertices = [];
 var edges = [];
+var ids = [];
+var edgeIDs = [];
+
+var config = {
+    dataSource: graphJSON,
+    nodeTypes: {
+        // gene, gene, gene, protein, methylation, miRNA
+        "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"]
+    },
+//        nodeMouseOver: function(node) {
+//            return node.tumor_type;
+//        },
+    nodeStyle: {
+        "all": {
+            "radius": 10
+        },
+        "GEXB": {
+            "color": "#004953"
+        },
+        "GNAB": {
+            "color": "#004953"
+        },
+        "CNVR": {
+            "color": "#004953"
+        },
+        "RPPA": {
+            "color": "#800080"
+        },
+        "METH": {
+            "color": "#32b835"
+        },
+        "MIRN": {
+            "color": "#f08080"
+        }
+    }
+};
+
 
 $(window).load(function() {
     if(id) {
@@ -26,13 +63,16 @@ function queryRexster(query, callback) {
         dataType: "json",
         contentType: "application/json",
         success: function (json) {
+
+            console.log(JSON.stringify(json));
+
             ParseJSONData(json);
             callback();
         }
     });
 }
 
-function queryVertexId(query, callback) {
+function queryVertexID(query, callback) {
     $.ajax({
         type: "GET",
         url: rexsterURL + query,
@@ -45,38 +85,36 @@ function queryVertexId(query, callback) {
 }
 
 function ParseJSONData(data) {
-    var result;
 
     if(Array.isArray(data.results)) {
         $.each(data.results, function (i, item) {
             var dataItem;
-            if(item._type === 'vertex') {
+            if(item._type === 'vertex' && ids.indexOf(item._id) === -1){
+                ids.push(item._id);
                 dataItem = createVertex(item);
-
-                result = $.grep(vertices, function(item){return item.id == id; });
 
                 vertices.push(dataItem);
 
-//                if(result.length === 0) { vertices.push(dataItem); }
-
-            } else {
+            } else if(item._type === 'edge' && edgeIDs.indexOf(item._id) === -1) {
+                edgeIDs.push(item.edgeID);
                 dataItem = createEdge(item);
                 edges.push(dataItem);
+            } else {
+                console.log("Error 1");
             }
         });
     } else {
-        if(data.results._type === 'vertex') {
+        if(data.results._type === 'vertex' && ids.indexOf(data.results._id) === -1) {
+            ids.push(data.results._id);
             dataItem = createVertex(data.results);
 
-            //See if vertex is already added to vertices array
-            var result = $.grep(vertices, function(item){ return item.id == id; });
-
             vertices.push(dataItem);
-
-//            if(result.length === 0) { vertices.push(dataItem); }
-        } else {
+        } else if(data.results._type === 'edge' && edgeIDs.indexOf(data.results._id) === -1) {
+            edgeIDs.push(data.results.edgeID);
             dataItem = createEdge(data.results);
             edges.push(dataItem);
+        } else {
+            console.log("Error 2");
         }
     }
 }
@@ -101,7 +139,7 @@ function createEdge(item){
     var edge = {
         source: item._inV,
         target: item._outV,
-        nodeID: item._id,
+        edgeID: item._id,
         bonferroni: item.bonferroni,
         sample_size: item.sample_size,
         min_log_p_uncorrected: item.min_log_p_uncorrected,
@@ -116,7 +154,7 @@ function createEdge(item){
 }
 
 function getVertexID(key, value, callback) {
-    queryVertexId("vertices?key=" + key + "&value=" + value, function(id){
+    queryVertexID("vertices?key=" + key + "&value=" + value, function(id){
         getStartingVertex(id, callback);
     });
 }
@@ -153,57 +191,9 @@ function buildGraphJSON(callback) {
 
     callback();
 }
-/*
-case "GEXB":
-objectID1 =  tumor_type + ' Gene ' + name1
-case "GNAB":
-objectID1 =  tumor_type + ' Gene ' + name1
-case "CNVR":
-objectID1 =  tumor_type + ' Gene ' + name1
-case "RPPA":
-objectID1 =  tumor_type + ' Protein ' + name1
-case "METH":
-objectID1 =  tumor_type + ' Methylation ' + name1
-case "MIRN":
-objectID1 =  tumor_type + ' miRNA ' + name1
-*/
 
 function buildChart() {
-    console.log(JSON.stringify(graphJSON));
-    var config = {
-        "dataSource": graphJSON //,
-        /*
-        "nodeTypes": { "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"] },
-        //"nodeCaption": "name",
-        //"edgeCaption": "genomic_distance",
-        "nodeMouseOver": function(node) {
-            return node.tumor_type;
-        },
-        "nodeStyle": {
-            "all": {
-                "radius": 10
-            },
-            "GEXB": {
-                "color": "#004953"
-            },
-            "GNAB": {
-                "color": "#004953"
-            },
-            "CNVR": {
-                "color": "#004953"
-            },
-            "RPPA": {
-                "color": "#800080"
-            },
-            "METH": {
-                "color": "#32b835"
-            },
-            "MIRN": {
-                "color": "#f08080"
-            }
-        }
-        */
-    }
+    console.log(JSON.stringify(graphJSON.edges));
 
 //    var alchemy = new Alchemy(config);
 }
