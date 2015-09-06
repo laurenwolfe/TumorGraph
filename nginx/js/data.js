@@ -20,6 +20,7 @@ $(window).load(function() {
 });
 
 function queryRexster(query, cb) {
+    console.log("queryURL: " + rexsterURL + query);
     $.ajax({
         type: "GET",
         url: rexsterURL + query,
@@ -27,7 +28,7 @@ function queryRexster(query, cb) {
         contentType: "application/json",
         success: function (json) {
             ParseJSONData(json.results);
-            cb();
+//            cb();
         }
     });
 }
@@ -39,23 +40,41 @@ function queryVertexId(query, cb) {
         dataType: "json",
         contentType: "application/json",
         success: function (json) {
+            console.log("queryVertexId success json: " + json);
             cb(json.results._id);
         }
     });
 }
 
-function ParseJSONData(items) {
+function ParseJSONData(data) {
+    console.log(JSON.stringify(data));
+/*    var itemsObj = JSON.stringify(data);
+    var test = "objectID";
+
+    console.log("1 " + itemsObj[test]);
+    console.log("2 " + itemsObj["objectID"]);
+    console.log("3 " + itemsObj[0]);
+
+/*    for (var key in itemsObj[test]) {
+        console.log("Key: " + key);
+        console.log("Value: " + obj.d[key]);
+    }
+    /*
     $.each(items, function (i, item) {
         var dataItem;
-
         if(item._type === 'vertex') {
             dataItem = createVertex(item);
             vertices.push(dataItem);
+
         } else {
             dataItem = createEdge(item);
             edges.push(dataItem);
         }
     });
+
+    console.log("vertices " + vertices);
+    console.log("edges " + edges);
+    */
 }
 
 function createVertex(item){
@@ -132,6 +151,5 @@ function buildGraphJSON(callback) {
 }
 
 function buildChart() {
-    console.log(graphJSON);
     alchemy.begin({"dataSource": graphJSON})
 }

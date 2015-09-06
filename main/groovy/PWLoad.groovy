@@ -114,52 +114,53 @@
 
                 //Generate objectIDs by concatenating the tumor type, feature type and gene name
                 switch(featureType1) {
-                    case "GEXB": 
-                        objectID1 =  tumor_type + ':Gene:' + name1
+                    case "GEXB":
+                        objectID1 =  tumor_type + ' Gene ' + name1
                         break
                     case "GNAB":
-                        objectID1 =  tumor_type + ':Gene:' + name1
+                        objectID1 =  tumor_type + ' Gene ' + name1
                         break
                     case "CNVR":
-                        objectID1 =  tumor_type + ':Gene:' + name1
+                        objectID1 =  tumor_type + ' Gene ' + name1
                         break
                     case "RPPA":
-                        objectID1 =  tumor_type + ':Protein:' + name1
+                        objectID1 =  tumor_type + ' Protein ' + name1
                         break
                     case "METH":
-                        objectID1 =  tumor_type + ':Methylation:' + name1
-                        break            
+                        objectID1 =  tumor_type + ' Methylation ' + name1
+                        break
                     case "MIRN":
-                        objectID1 =  tumor_type + ':miRNA:' + name1
+                        objectID1 =  tumor_type + ' miRNA ' + name1
                         break
                     default:
-                        objectID1 = tumor_type + ':' + featureType1 + ':' + name1
+                        objectID1 = tumor_type + ' ' + featureType1 + ' ' + name1
                         break
                 }
 
                 switch(featureType2) {
-                    case "GEXB": 
-                        objectID2 =  tumor_type + ':Gene:' + name2
+                    case "GEXB":
+                        objectID2 =  tumor_type + ' Gene ' + name2
                         break
                     case "GNAB":
-                        objectID2 =  tumor_type + ':Gene:' + name2
+                        objectID2 =  tumor_type + ' Gene ' + name2
                         break
                     case "CNVR":
-                        objectID2 =  tumor_type + ':Gene:' + name2
+                        objectID2 =  tumor_type + ' Gene ' + name2
                         break
                     case "RPPA":
-                        objectID2 =  tumor_type + ':Protein:' + name2
+                        objectID2 =  tumor_type + ' Protein ' + name2
                         break
                     case "METH":
-                        objectID2 =  tumor_type + ':Methylation:' + name2
-                        break            
+                        objectID2 =  tumor_type + ' Methylation ' + name2
+                        break
                     case "MIRN":
-                        objectID2 =  tumor_type + ':miRNA:' + name2
+                        objectID2 =  tumor_type + ' miRNA ' + name2
                         break
                     default:
-                        objectID2 = tumor_type + ':' + featureType1 + ':' + name2
+                        objectID2 = tumor_type + ' ' + featureType1 + ' ' + name2
                         break
                 }
+
                 
                 //Does the vertex already exist? If not, create it in the db
                 if(!bg.getVertex(objectID1)) {
