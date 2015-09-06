@@ -45,13 +45,19 @@ function queryVertexId(query, callback) {
 }
 
 function ParseJSONData(data) {
+    var result;
 
     if(Array.isArray(data.results)) {
         $.each(data.results, function (i, item) {
             var dataItem;
             if(item._type === 'vertex') {
                 dataItem = createVertex(item);
+
+                result = $.grep(vertices, function(item){return item.id == id; });
+
                 vertices.push(dataItem);
+
+//                if(result.length === 0) { vertices.push(dataItem); }
 
             } else {
                 dataItem = createEdge(item);
@@ -61,7 +67,13 @@ function ParseJSONData(data) {
     } else {
         if(data.results._type === 'vertex') {
             dataItem = createVertex(data.results);
+
+            //See if vertex is already added to vertices array
+            var result = $.grep(vertices, function(item){ return item.id == id; });
+
             vertices.push(dataItem);
+
+//            if(result.length === 0) { vertices.push(dataItem); }
         } else {
             dataItem = createEdge(data.results);
             edges.push(dataItem);
@@ -157,13 +169,19 @@ objectID1 =  tumor_type + ' miRNA ' + name1
 */
 
 function buildChart() {
-//    console.log(JSON.stringify(graphJSON));
+    console.log(JSON.stringify(graphJSON));
     var config = {
-        "dataSource": graphJSON,
+        "dataSource": graphJSON //,
+        /*
         "nodeTypes": { "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"] },
+        //"nodeCaption": "name",
+        //"edgeCaption": "genomic_distance",
+        "nodeMouseOver": function(node) {
+            return node.tumor_type;
+        },
         "nodeStyle": {
             "all": {
-                "radius": 20
+                "radius": 10
             },
             "GEXB": {
                 "color": "#004953"
@@ -184,7 +202,8 @@ function buildChart() {
                 "color": "#f08080"
             }
         }
+        */
     }
 
-    var alchemy = new Alchemy(config);
+//    var alchemy = new Alchemy(config);
 }
