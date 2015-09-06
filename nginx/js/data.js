@@ -141,11 +141,49 @@ function buildGraphJSON(callback) {
 
     callback();
 }
+/*
+case "GEXB":
+objectID1 =  tumor_type + ' Gene ' + name1
+case "GNAB":
+objectID1 =  tumor_type + ' Gene ' + name1
+case "CNVR":
+objectID1 =  tumor_type + ' Gene ' + name1
+case "RPPA":
+objectID1 =  tumor_type + ' Protein ' + name1
+case "METH":
+objectID1 =  tumor_type + ' Methylation ' + name1
+case "MIRN":
+objectID1 =  tumor_type + ' miRNA ' + name1
+*/
 
 function buildChart() {
 //    console.log(JSON.stringify(graphJSON));
     var config = {
-        dataSource: graphJSON
+        "dataSource": graphJSON,
+        "nodeTypes": { "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"] },
+        "nodeStyle": {
+            "all": {
+                "radius": 20
+            },
+            "GEXB": {
+                "color": "#004953"
+            },
+            "GNAB": {
+                "color": "#004953"
+            },
+            "CNVR": {
+                "color": "#004953"
+            },
+            "RPPA": {
+                "color": "#800080"
+            },
+            "METH": {
+                "color": "#32b835"
+            },
+            "MIRN": {
+                "color": "#f08080"
+            }
+        }
     }
 
     var alchemy = new Alchemy(config);

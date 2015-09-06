@@ -111,7 +111,7 @@
 
             //This is for filtering by annotation type, currently both bioentities need to be code_potential_somatic for the 
             //code block to execute.
-            if(annotation1 == "code_potential_somatic" && annotation2 == "code_potential_somatic") {
+//            if(annotation1 == "code_potential_somatic" && annotation2 == "code_potential_somatic") {
 
                 //Generate objectIDs by concatenating the tumor type, feature type and gene name
                 switch(featureType1) {
@@ -218,7 +218,7 @@
                 edge.setProperty("feature_types", featureType1 + ':' + featureType2)
 
                 x++
-            }
+//            }
         })
         println x + " edges generated"
         println y + " vertices generated"
