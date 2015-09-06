@@ -1,9 +1,9 @@
 //Query path and string
 var rexsterURL = "http://glados49:8182/graphs/tumorgraph/";
 
-var id = '322560';
+var id = '41472';
 var key = "objectID";
-var val = "stad:Gene:TG";
+var val = "stad Gene TG";
 
 var graphJSON;
 var vertices = [];
@@ -19,62 +19,54 @@ $(window).load(function() {
     }
 });
 
-function queryRexster(query, cb) {
-    console.log("queryURL: " + rexsterURL + query);
+function queryRexster(query, callback) {
     $.ajax({
         type: "GET",
         url: rexsterURL + query,
         dataType: "json",
         contentType: "application/json",
         success: function (json) {
-            ParseJSONData(json.results);
-//            cb();
+            ParseJSONData(json);
+            callback();
         }
     });
 }
 
-function queryVertexId(query, cb) {
+function queryVertexId(query, callback) {
     $.ajax({
         type: "GET",
         url: rexsterURL + query,
         dataType: "json",
         contentType: "application/json",
         success: function (json) {
-            console.log("queryVertexId success json: " + json);
-            cb(json.results._id);
+            callback(json.results._id);
         }
     });
 }
 
 function ParseJSONData(data) {
-    console.log(JSON.stringify(data));
-/*    var itemsObj = JSON.stringify(data);
-    var test = "objectID";
 
-    console.log("1 " + itemsObj[test]);
-    console.log("2 " + itemsObj["objectID"]);
-    console.log("3 " + itemsObj[0]);
+    if(Array.isArray(data.results)) {
+        $.each(data.results, function (i, item) {
+            var dataItem;
+            if(item._type === 'vertex') {
+                dataItem = createVertex(item);
+                vertices.push(dataItem);
 
-/*    for (var key in itemsObj[test]) {
-        console.log("Key: " + key);
-        console.log("Value: " + obj.d[key]);
-    }
-    /*
-    $.each(items, function (i, item) {
-        var dataItem;
-        if(item._type === 'vertex') {
-            dataItem = createVertex(item);
+            } else {
+                dataItem = createEdge(item);
+                edges.push(dataItem);
+            }
+        });
+    } else {
+        if(data.results._type === 'vertex') {
+            dataItem = createVertex(data.results);
             vertices.push(dataItem);
-
         } else {
-            dataItem = createEdge(item);
+            dataItem = createEdge(data.results);
             edges.push(dataItem);
         }
-    });
-
-    console.log("vertices " + vertices);
-    console.log("edges " + edges);
-    */
+    }
 }
 
 function createVertex(item){
@@ -97,6 +89,7 @@ function createEdge(item){
     var edge = {
         source: item._inV,
         target: item._outV,
+        nodeID: item._id,
         bonferroni: item.bonferroni,
         sample_size: item.sample_size,
         min_log_p_uncorrected: item.min_log_p_uncorrected,
@@ -107,7 +100,6 @@ function createEdge(item){
         genomic_distance: item.genomic_distance,
         feature_types: item.feature_types
     };
-
     return edge;
 }
 
@@ -151,5 +143,10 @@ function buildGraphJSON(callback) {
 }
 
 function buildChart() {
-    alchemy.begin({"dataSource": graphJSON})
+//    console.log(JSON.stringify(graphJSON));
+    var config = {
+        dataSource: graphJSON
+    }
+
+    var alchemy = new Alchemy(config);
 }

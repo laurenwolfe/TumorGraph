@@ -1,43 +1,43 @@
-<div id="popover" style="display: none; position: absolute; min-width: 250px; pointer-events: none;" class="popover right">
-    <h2 id="popoverTitle" class="popover-title"></h2>
-    <div class="popover-content">
-        <script id="popoverNodeTemplate" type="text/template">
-            <table class="table table-bordered">
-                <tbody id="content">
-                <tr>
-                    <td>ObjectID: </td>
-                    <td>{{objectID}}</td>
-                </tr>
-                <tr>
-                    <td>Start: </td>
-                    <td>{{start}}</td>
-                </tr>
-                <tr>
-                    <td>Name: </td>
-                    <td>{{name}}</td>
-                </tr>
-                <tr>
-                    <td>Strand: </td>
-                    <td>{{strand}}</td>
-                </tr>
-                <tr>
-                    <td>End: </td>
-                    <td>{{end}}</td>
-                </tr>
-                <tr>
-                    <td>Chr: </td>
-                    <td>{{chr}}</td>
-                </tr>
-                <tr>
-                    <td>Tumor type: </td>
-                    <td>{{tumor_type}}</td>
-                </tr>
-                <tr>
-                    <td>Version: </td>
-                    <td>{{version}}</td>
-                </tr>
-                </tbody>
-            </table>
-        </script>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancer Graph Database</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css">
+    <link rel="stylesheet" href="http://cdn.graphalchemist.com/alchemy.css">
+
+    <!-- JQUERY -->
+    <script src="//code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
+
+    <!-- LO-DASH -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+
+    <!-- BOOTSTRAP -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+
+    <!-- D3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.js"></script>
+
+    <!-- MUSTACHE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.1.3/mustache.js"></script>
+
+    <!-- Alchemy -->
+
+</head>
+
+<body>
+<script type="text/javascript" src="http://cdn.graphalchemist.com/alchemy.js"></script>
+<script src="/js/data.js" id="graph">
+
+    console.log(JSON.stringify(graph));
+</script>
+
+<div id="alchemy" class="alchemy"></div>
+
+
+</body>
+</html>

@@ -22,6 +22,7 @@
     strand = mgmt.makePropertyKey('strand').dataType(Character.class).make()
     tumor_type = mgmt.makePropertyKey('tumor_type').dataType(String.class).make()
     version = mgmt.makePropertyKey('version').dataType(String.class).make()
+    feature_type = mgmt.makePropertyKey('feature_type').dataType(String.class).make()
 
     /*
     Edge properties -- inline comment corresponds to column #:
@@ -169,6 +170,7 @@
                     v1.setProperty("name", name1)
                     v1.setProperty("tumor_type", tumor_type)
                     v1.setProperty("version", version)
+                    v1.setProperty("feature_type", feature_type)
 
                     //Some of these may be empty, so let's test for that.
                     !chr1 ?: v1.setProperty("chr", chr1)
@@ -188,6 +190,7 @@
                     v2.setProperty("name", name2)
                     v2.setProperty("tumor_type", tumor_type)
                     v2.setProperty("version", version)
+                    v2.setProperty("feature_type", feature_type)
 
                     //Some of these may be empty, so let's test for that.
                     !chr2 ?: v2.setProperty("chr", chr2)
