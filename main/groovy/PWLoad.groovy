@@ -214,6 +214,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         //Some of these may be empty, so let's test for that
         println "v1: " + v1 + "  v2: " + v2
 
+        pw = v1 + "-" + v2
+
         if(!edgeList.contains(pw)) {
             edgeList.add(pw)
 
