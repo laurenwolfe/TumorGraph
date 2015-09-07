@@ -1,0 +1,13 @@
+Edge properties -- inline comment corresponds to column #:
+# 1 feature A
+# 2 feature B (order is alphabetical, and has no effect on result)
+# 3 Spearman correlation coefficient (range is [-1,+1], also can be "NA" if cannot be calculated or is not appropriate to the data)
+# 4 number of samples used for pairwise test (non-NA overlap of feature A and feature B)
+# 5 -log10(p-value)  (uncorrected)
+# 6 log10(Bonferroni correction factor)
+# 7 -log10(corrected p-value)   [ col #7 = min ( (col #5 - col #6), 0 ) ]
+# 8 # of non-NA samples in feature A that were not used in pairwise test
+# 9 -log(p-value) that the samples from A that were not used are "different" from those that were
+#10 (same as col #8 but for feature B)
+#11 (same as col #9 but for feature B)
+#12 genomic distance between features A and B (if not on same chromosome or one or both do not have coordinates, then this value is set to 500000000)
