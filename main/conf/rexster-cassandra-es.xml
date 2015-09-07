@@ -3,7 +3,7 @@
     <http>
         <server-port>8182</server-port>
         <server-host>0.0.0.0</server-host>
-        <base-uri>http://192.168.99.100</base-uri>
+        <base-uri>http://glados49</base-uri>
         <web-root>public</web-root>
         <character-set>UTF-8</character-set>
         <enable-jmx>false</enable-jmx>
@@ -35,11 +35,11 @@
         <thread-pool>
             <worker>
                 <core-size>8</core-size>
-                <max-size>8</max-size>
+                <max-size>128</max-size>
             </worker>
             <kernal>
                 <core-size>4</core-size>
-                <max-size>4</max-size>
+                <max-size>32</max-size>
             </kernal>
         </thread-pool>
         <io-strategy>leader-follower</io-strategy>
@@ -97,7 +97,7 @@
                 <storage.backend>cassandra</storage.backend>
                 <storage.hostname>localhost</storage.hostname>
                 <index.search.backend>elasticsearch</index.search.backend>
-                <storage.buffer-size>100</storage.buffer-size>
+                <storage.buffer-size>1024</storage.buffer-size>
             </properties>
             <extensions>
                 <allows>

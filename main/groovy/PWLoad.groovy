@@ -1,5 +1,4 @@
 //Yo! I'm Lauren and I wrote this code.
-
 conf = new BaseConfiguration() {
     {
         setProperty("storage.backend", "cassandra")
