@@ -1,50 +1,15 @@
 //Query path and string
 var rexsterURL = "http://glados49:8182/graphs/tumorgraph/";
 
-var id = '41472';
+var id = '58112';
 var key = "objectID";
-var val = "stad:Gene:TG";
+var val = "stad:Gene:ADCY8";
 
 var graphJSON;
 var vertices = [];
 var edges = [];
 var ids = [];
 var edgeIDs = [];
-
-var config = {
-    dataSource: graphJSON,
-    nodeTypes: {
-        // gene, gene, gene, protein, methylation, miRNA
-        "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"]
-    },
-//        nodeMouseOver: function(node) {
-//            return node.tumor_type;
-//        },
-    nodeStyle: {
-        "all": {
-            "radius": 10
-        },
-        "GEXB": {
-            "color": "#004953"
-        },
-        "GNAB": {
-            "color": "#004953"
-        },
-        "CNVR": {
-            "color": "#004953"
-        },
-        "RPPA": {
-            "color": "#800080"
-        },
-        "METH": {
-            "color": "#32b835"
-        },
-        "MIRN": {
-            "color": "#f08080"
-        }
-    }
-};
-
 
 $(window).load(function() {
     if(id) {
@@ -63,9 +28,6 @@ function queryRexster(query, callback) {
         dataType: "json",
         contentType: "application/json",
         success: function (json) {
-
-            console.log(JSON.stringify(json));
-
             ParseJSONData(json);
             callback();
         }
@@ -193,7 +155,47 @@ function buildGraphJSON(callback) {
 }
 
 function buildChart() {
-    console.log(JSON.stringify(graphJSON.edges));
+    var config = {
+        dataSource: graphJSON,
+        caption: function(node) {
+            var str = node.tumor_type + ": " + node.name;
 
-//    var alchemy = new Alchemy(config);
+            alert(str);
+            return str;
+        },
+        nodeTypes: {
+            // gene, gene, gene, protein, methylation, miRNA
+            "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"],
+            "tumor_type": ["acc", "blca", "brca", "cesc", "chol", "coad", "dlbc", "esca", "gbm", "hnsc",
+                "kich", "kirc", "kirp", "laml", "lgg", "lihc", "luad", "lusc", "meso", "ov", "paad", "pcpg",
+                "prad", "read", "sarc", "skcm", "stad", "tgct", "thca", "thym", "ucec", "ucs", "uvm"],
+            "annotation": []
+        },
+        showControlDash: true,
+
+        nodeStyle: {
+            "all": {
+                "radius": 10
+            },
+            "GEXB": {
+                "color": "#004953"
+            },
+            "GNAB": {
+                "color": "#004953"
+            },
+            "CNVR": {
+                "color": "#004953"
+            },
+            "RPPA": {
+                "color": "#800080"
+            },
+            "METH": {
+                "color": "#32b835"
+            },
+            "MIRN": {
+                "color": "#f08080"
+            }
+        }
+    };
+    var alchemy = new Alchemy(config);
 }

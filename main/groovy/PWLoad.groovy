@@ -4,7 +4,6 @@ conf = new BaseConfiguration() {
         setProperty("storage.backend", "cassandra")
         setProperty("storage.hostname", "127.0.0.1")
         setProperty("storage.batch-loading", true)
-
     }
 }
 
