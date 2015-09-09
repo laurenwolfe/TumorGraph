@@ -103,10 +103,6 @@
                 <allows>
                     <allow>tp:gremlin</allow>
                 </allows>
-                <extension>
-                    <namespace>tp</namespace>
-                    <name>gremlin</name>
-                </extension>
             </extensions>
         </graph>
     </graphs>
