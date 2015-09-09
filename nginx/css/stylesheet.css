@@ -1,0 +1,19 @@
+body {
+    background-color: black;
+}
+
+label {
+    font-size: 110%;
+    color: white;
+    padding-right: 5px;
+}
+
+#mine {
+    color: white;
+    font-size: 150%;
+    padding-left: 10px;
+}
+
+#query-form {
+    padding: 10px;
+}

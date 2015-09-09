@@ -1,7 +1,15 @@
 //Query path and string
 var rexsterURL = "http://glados49:8182/graphs/tumorgraph/";
+var gremlin = "tp/gremlin?";
 
-var id = '58112';
+//supernode that loads
+//var id = '58112';
+
+//supernode that crashes browser
+//var id = '2048';
+
+//smaller set
+var id = '840704';
 var key = "objectID";
 var val = "stad:Gene:ADCY8";
 
@@ -20,6 +28,23 @@ $(window).load(function() {
         //Choose a random default location to start the chart from.
     }
 });
+
+function passedQuery(q) {
+    queryGremlin();
+}
+
+function queryGremlin(q) {
+    $.ajax({
+        type: "GET",
+        url: rexsterURL + gremlin + q,
+        dataType: "json",
+        contentType: "application/json",
+        success: function (json) {
+            console.log(json.results);
+//            callback();
+        }
+    });
+}
 
 function queryRexster(query, callback) {
     $.ajax({
@@ -91,7 +116,8 @@ function createVertex(item){
         end: item.end,
         chr: item.chr,
         tumor_type: item.tumor_type,
-        version: item.version
+        version: item.version,
+        feature_type: item.feature_type
     };
 
     return node;
@@ -157,25 +183,29 @@ function buildGraphJSON(callback) {
 function buildChart() {
     var config = {
         dataSource: graphJSON,
-        caption: function(node) {
-            var str = node.tumor_type + ": " + node.name;
-
-            alert(str);
-            return str;
-        },
+        linkDistance: function(){ return 10; },
+//        graphHeight: function(){ return 600; },
+//        graphWidth: function(){ return 800; },
+        nodeCaption: "objectID",
+        nodeCaptionsOnByDefault: true,
         nodeTypes: {
             // gene, gene, gene, protein, methylation, miRNA
-            "feature_type": ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"],
-            "tumor_type": ["acc", "blca", "brca", "cesc", "chol", "coad", "dlbc", "esca", "gbm", "hnsc",
+            feature_type: ["GEXB", "GNAB", "CNVR", "RPPA", "METH", "MIRN"]
+/*            tumor_type: ["acc", "blca", "brca", "cesc", "chol", "coad", "dlbc", "esca", "gbm", "hnsc",
                 "kich", "kirc", "kirp", "laml", "lgg", "lihc", "luad", "lusc", "meso", "ov", "paad", "pcpg",
-                "prad", "read", "sarc", "skcm", "stad", "tgct", "thca", "thym", "ucec", "ucs", "uvm"],
-            "annotation": []
+                "prad", "read", "sarc", "skcm", "stad", "tgct", "thca", "thym", "ucec", "ucs", "uvm"]
+*/
         },
         showControlDash: true,
-
+        showStats: true,
+        nodeStats: true,
+        forceLocked: false,
+        zoomControls: true,
+        nodeFilters: true,
+        showFilters: true,
         nodeStyle: {
             "all": {
-                "radius": 10
+                "borderColor": "#B5B5B5"
             },
             "GEXB": {
                 "color": "#004953"
@@ -195,7 +225,10 @@ function buildChart() {
             "MIRN": {
                 "color": "#f08080"
             }
-        }
+        },
     };
-    var alchemy = new Alchemy(config);
+
+    alchemy.begin(config);
+
+    //alchemy = new Alchemy(config);
 }

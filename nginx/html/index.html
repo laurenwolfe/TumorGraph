@@ -1,14 +1,23 @@
-<!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="http://cdn.graphalchemist.com/alchemy.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/vendor.css">
+    <link rel="stylesheet" href="/css/alchemy.css">
+    <link rel="stylesheet" href="/css/stylesheet.css">
 </head>
 <body>
-    <div class="alchemy" id="alchemy" style="height: 400px; width: 400px; color: black"></div>
+    <script type="text/javascript" src="/js/vendor.js"></script>
+    <script type="text/javascript" src="/js/alchemy.js"></script>
+<!--    <script type="text/javascript" src="/js/data.js"></script> -->
+    <script type="text/javascript" src="/js/queryData.js"></script>
 
-    <script src="http://cdn.graphalchemist.com/alchemy.min.js"></script>
-    <script src="/js/data.js"></script>
+    <h1 id="mine">Tumor Graph</h1>
+    <form id="query-form">
+        <label for="query">Enter query here: </label><input type="text" name="query" id="query" size="60"  />
+        <input type="submit" value="Submit" onclick="passedQuery(this.form.query.value)" />
+    </form>
+    <div class="alchemy" id="alchemy"></div>
+    <script type="text/javascript">
+    </script>
 </body>
 </html>
