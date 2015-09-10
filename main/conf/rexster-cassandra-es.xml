@@ -103,6 +103,13 @@
                 <allows>
                     <allow>tp:gremlin</allow>
                 </allows>
+                <extension>
+                    <namespace>tp</namespace>
+                    <name>gremlin</name>
+                    <configuration>
+                        <allow-client-script>true</allow-client-script>
+                    </configuration>
+                </extension>
             </extensions>
         </graph>
     </graphs>

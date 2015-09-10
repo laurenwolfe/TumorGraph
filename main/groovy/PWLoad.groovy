@@ -130,7 +130,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 break
         }
 
-        if (annotation1 == "code_somatic_potential") {
+        if (annotation1 == "code_potential_somatic") {
             //Does the vertex already exist? If not, create it in the db
             if (!idList.contains(objectID1)) {
 
