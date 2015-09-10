@@ -110,14 +110,15 @@ function createVertex(item){
     var node = {
         id: item._id,
         objectID: item.objectID,
-        start: item.start,
         name: item.name,
-        strand: item.strand,
-        end: item.end,
         chr: item.chr,
+        start: item.start,
+        end: item.end,
+        strand: item.strand,
         tumor_type: item.tumor_type,
         version: item.version,
-        feature_type: item.feature_type
+        feature_type: item.feature_type,
+        annotation: item.annotation
     };
 
     return node;
@@ -128,9 +129,11 @@ function createEdge(item){
         source: item._inV,
         target: item._outV,
         edgeID: item._id,
-        bonferroni: item.bonferroni,
+        correlation: item.correlation,
         sample_size: item.sample_size,
         min_log_p_uncorrected: item.min_log_p_uncorrected,
+        bonferroni: item.bonferroni,
+        min_log_p_corrected: item.min_log_p_corrected,
         excluded_sample_count_a: item.excluded_sample_count_a,
         min_log_p_unused_a: item.min_log_p_unused_a,
         excluded_sample_count_b: item.excluded_sample_count_b,
@@ -142,7 +145,9 @@ function createEdge(item){
 }
 
 function getVertexID(key, value, callback) {
-    queryVertexID("vertices?key=" + key + "&value=" + value, function(id){
+    var query = "vertices?key=" + key + "&value=" + value;
+
+    queryVertexID(query, function(id){
         getStartingVertex(id, callback);
     });
 }

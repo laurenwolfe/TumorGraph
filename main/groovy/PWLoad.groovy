@@ -130,71 +130,70 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 break
         }
 
-        if (annotation1 == "code_potential_somatic") {
-            //Does the vertex already exist? If not, create it in the db
-            if (!idList.contains(objectID1)) {
+        //Does the vertex already exist? If not, create it in the db
+        if (!idList.contains(objectID1)) {
 
-                v1 = bg.addVertex(objectID1)
-                v1.setProperty("objectID", objectID1)
-                v1.setProperty("name", name1)
-                v1.setProperty("tumor_type", tumor_type)
-                v1.setProperty("version", version)
-                v1.setProperty("feature_type", feature_type_1)
+            v1 = bg.addVertex(objectID1)
+            v1.setProperty("objectID", objectID1)
+            v1.setProperty("name", name1)
+            v1.setProperty("tumor_type", tumor_type)
+            v1.setProperty("version", version)
+            v1.setProperty("feature_type", feature_type_1)
 
-                //Some of these may be empty, so let's test for that.
-                !chr1 ?: v1.setProperty("chr", chr1)
-                !start1 ?: v1.setProperty("start", start1)
-                !end1 ?: v1.setProperty("end", end1)
-                !strand1 ?: v1.setProperty("strand", strand1)
-                !annotation1 ?: v1.setProperty("annotation", annotation1)
+            //Some of these may be empty, so let's test for that.
+            !chr1 ?: v1.setProperty("chr", chr1)
+            !start1 ?: v1.setProperty("start", start1)
+            !end1 ?: v1.setProperty("end", end1)
+            !strand1 ?: v1.setProperty("strand", strand1)
+            !annotation1 ?: v1.setProperty("annotation", annotation1)
 
-                idList.add(objectID1);
-            } else {
+            idList.add(objectID1);
+        } else {
 
-                v1 = bg.getVertex(objectID1)
-            }
-
-            if (!idList.contains(objectID2)) {
-
-                v2 = bg.addVertex(objectID2)
-                v2.setProperty("objectID", objectID2)
-                v2.setProperty("name", name2)
-                v2.setProperty("tumor_type", tumor_type)
-                v2.setProperty("version", version)
-                v2.setProperty("feature_type", feature_type_2)
-
-                //Some of these may be empty, so let's test for that.
-                !chr2 ?: v2.setProperty("chr", chr2)
-                !start2 ?: v2.setProperty("start", start2)
-                !end2 ?: v2.setProperty("end", end2)
-                !strand2 ?: v2.setProperty("strand", strand2)
-                !annotation2 ?: v2.setProperty("annotation", annotation2)
-
-                idList.add(objectID2);
-
-            } else {
-                v2 = bg.getVertex(objectID2)
-            }
-
-            if (!edgeList.contains(objectID1 + ":" + objectID2)) {
-                edge = bg.addEdge(null, v1, v2, "pairwise")
-                !correlation ?: edge.setProperty("correlation", correlation)
-                !sample_size ?: edge.setProperty("sample_size", sample_size)
-                !min_log_p_corrected ?: edge.setProperty("min_log_p_corrected", min_log_p_corrected)
-                !min_log_p_uncorrected ?: edge.setProperty("min_log_p_uncorrected", min_log_p_uncorrected)
-                !bonferroni ?: edge.setProperty("bonferroni", bonferroni)
-                !excluded_sample_count_a ?: edge.setProperty("excluded_sample_count_a", excluded_sample_count_a)
-                !min_log_p_unused_a ?: edge.setProperty("min_log_p_unused_a", min_log_p_unused_a)
-                !excluded_sample_count_b ?: edge.setProperty("excluded_sample_count_b", excluded_sample_count_b)
-                !min_log_p_unused_b ?: edge.setProperty("min_log_p_unused_b", min_log_p_unused_b)
-                !genomic_distance ?: edge.setProperty("genomic_distance", genomic_distance)
-                edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
-
-                edgeList.add(objectID1 + ":" + objectID2)
-            }
-
-            bg.commit()
+            v1 = bg.getVertex(objectID1)
         }
+
+        if (!idList.contains(objectID2)) {
+
+            v2 = bg.addVertex(objectID2)
+            v2.setProperty("objectID", objectID2)
+            v2.setProperty("name", name2)
+            v2.setProperty("tumor_type", tumor_type)
+            v2.setProperty("version", version)
+            v2.setProperty("feature_type", feature_type_2)
+
+            //Some of these may be empty, so let's test for that.
+            !chr2 ?: v2.setProperty("chr", chr2)
+            !start2 ?: v2.setProperty("start", start2)
+            !end2 ?: v2.setProperty("end", end2)
+            !strand2 ?: v2.setProperty("strand", strand2)
+            !annotation2 ?: v2.setProperty("annotation", annotation2)
+
+            idList.add(objectID2);
+
+        } else {
+            v2 = bg.getVertex(objectID2)
+        }
+
+        if (!edgeList.contains(objectID1 + ":" + objectID2)) {
+            edge = bg.addEdge(null, v1, v2, "pairwise")
+            !correlation ?: edge.setProperty("correlation", correlation)
+            !sample_size ?: edge.setProperty("sample_size", sample_size)
+            !min_log_p_corrected ?: edge.setProperty("min_log_p_corrected", min_log_p_corrected)
+            !min_log_p_uncorrected ?: edge.setProperty("min_log_p_uncorrected", min_log_p_uncorrected)
+            !bonferroni ?: edge.setProperty("bonferroni", bonferroni)
+            !excluded_sample_count_a ?: edge.setProperty("excluded_sample_count_a", excluded_sample_count_a)
+            !min_log_p_unused_a ?: edge.setProperty("min_log_p_unused_a", min_log_p_unused_a)
+            !excluded_sample_count_b ?: edge.setProperty("excluded_sample_count_b", excluded_sample_count_b)
+            !min_log_p_unused_b ?: edge.setProperty("min_log_p_unused_b", min_log_p_unused_b)
+            !genomic_distance ?: edge.setProperty("genomic_distance", genomic_distance)
+            edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
+
+            edgeList.add(objectID1 + ":" + objectID2)
+        }
+
+        bg.commit()
+
     })
 
 })
