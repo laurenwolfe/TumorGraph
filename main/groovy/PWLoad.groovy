@@ -10,8 +10,11 @@ conf = new BaseConfiguration() {
 g = TitanFactory.open(conf)
 mgmt = g.getManagementSystem()
 
-/* *********************** */
-/* CREATE DATABASE SCHEMA */
+
+/*************************
+ * CREATE DATABASE SCHEMA
+ *
+ *************************/
 
 //This will be generated as "feature_type:geneId"
 objectID = mgmt.makePropertyKey('objectID').dataType(String.class).make()
@@ -48,10 +51,15 @@ feature_types = mgmt.makePropertyKey('feature_types').dataType(String.class).mak
 
 //Create index of ObjectId to speed map building
 mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompositeIndex()
+mgmt.buildIndex('byID', Vertex.class).addKey(_id).unique().buildCompositeIndex()
+mgmt.buildIndex('byVertices', Edge.class).addKey(_inV).addKey(_outV).buildCompositeIndex()
 mgmt.commit()
 
-/* **************** */
-/* DATA PROCESSING */
+
+/******************
+ * DATA PROCESSING
+ *
+ ******************/
 
 bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
