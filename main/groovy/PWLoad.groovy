@@ -11,10 +11,10 @@ g = TitanFactory.open(conf)
 mgmt = g.getManagementSystem()
 
 
-/*************************
- * CREATE DATABASE SCHEMA
- *
- *************************/
+//*************************//
+// CREATE DATABASE SCHEMA  //
+//                         //
+//*************************//
 
 //This will be generated as "feature_type:geneId"
 objectID = mgmt.makePropertyKey('objectID').dataType(String.class).make()
@@ -54,10 +54,10 @@ mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompo
 mgmt.commit()
 
 
-/******************
- * DATA PROCESSING
- *
- ******************/
+//******************//
+//* DATA PROCESSING //
+//*                 //
+//******************//
 
 bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
@@ -66,7 +66,7 @@ idList = []
 edgeList = []
 def objectID1
 def objectID2
-id = 0
+def id = 0
 
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
