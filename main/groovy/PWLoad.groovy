@@ -66,7 +66,6 @@ idList = []
 edgeList = []
 def objectID1
 def objectID2
-def id = 0
 
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
@@ -76,6 +75,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
     def details = file_iter.split('\\.')
 
     new File(file_iter).eachLine({ final String line ->
+        id = 0
 
         tumor_type = details[0]
         version = details[2]
