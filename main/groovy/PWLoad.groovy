@@ -51,8 +51,6 @@ feature_types = mgmt.makePropertyKey('feature_types').dataType(String.class).mak
 
 //Create index of ObjectId to speed map building
 mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompositeIndex()
-mgmt.buildIndex('byID', Vertex.class).addKey(_id).unique().buildCompositeIndex()
-mgmt.buildIndex('byVertices', Edge.class).addKey(_inV).addKey(_outV).buildCompositeIndex()
 mgmt.commit()
 
 
@@ -68,6 +66,7 @@ idList = []
 edgeList = []
 def objectID1
 def objectID2
+id = 0
 
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
@@ -156,6 +155,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             !annotation1 ?: v1.setProperty("annotation", annotation1)
 
             idList.add(objectID1);
+
+            i++
         } else {
 
             v1 = bg.getVertex(objectID1)
@@ -178,7 +179,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             !annotation2 ?: v2.setProperty("annotation", annotation2)
 
             idList.add(objectID2);
-
+            i++
         } else {
             v2 = bg.getVertex(objectID2)
         }
@@ -198,9 +199,10 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
 
             edgeList.add(objectID1 + ":" + objectID2)
+            i++
         }
 
-        bg.commit()
+        if(i%10000 == 0) { bg.commit() }
 
     })
 
