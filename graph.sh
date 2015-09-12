@@ -1,7 +1,6 @@
 #!/bin/sh
 docker stop graph
 docker rm graph
-cd ../
 rm -rf TumorGraph
 git clone https://github.com/laurenwolfe/TumorGraph.git
 cd TumorGraph
