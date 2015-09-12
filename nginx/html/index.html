@@ -1,29 +1,32 @@
 <html>
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="/css/vendor.css">
-    <link rel="stylesheet" href="/css/alchemy.css">
-    <link rel="stylesheet" href="/css/stylesheet.css">
-</head>
-<body>
-    <script type="text/javascript" src="/js/vendor.js"></script>
-    <script type="text/javascript" src="/js/alchemy.js"></script>
-<!--    <script type="text/javascript" src="/js/data.js"></script> -->
-    <script type="text/javascript" src="/js/queryData.js"></script>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="/css/vendor.css">
+        <link rel="stylesheet" href="/css/alchemy.css">
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
 
-    <h1 id="mine">Tumor Graph</h1>
-    <form id="query-form">
-        <label for="query">Enter query here: </label><input type="text" name="query" id="query" size="60"  />
-        <input type="submit" value="Submit" />
-    </form>
-    <div class="alchemy" id="alchemy"></div>
-    <script type="text/javascript">
+    <body>
+        <script type="text/javascript" src="/js/vendor.js"></script>
+        <script type="text/javascript" src="/js/alchemy.js"></script>
+        <script type="text/javascript" src="/js/queryData.js"></script>
 
-        $('#query-form').submit(function () {
-            passedQuery($('#query').val());
-            return false;
-        });
+        <h1 id="mine">Tumor Graph</h1>
 
-    </script>
-</body>
+        <form id="query-form">
+            <label for="query">Enter query here: </label><input type="text" name="query" id="query" size="60"  />
+            <input type="submit" value="Submit" />
+        </form>
+
+        <div class="alchemy" id="alchemy"></div>
+
+        <script type="text/javascript">
+
+            $('#query-form').submit(function () {
+                passedQuery($('#query').val());
+                return false;
+            });
+
+        </script>
+    </body>
 </html>
