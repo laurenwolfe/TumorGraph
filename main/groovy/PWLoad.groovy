@@ -75,7 +75,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
     def details = file_iter.split('\\.')
 
     new File(file_iter).eachLine({ final String line ->
-        id = 0
+        def id = 0
 
         tumor_type = details[0]
         version = details[2]
@@ -202,7 +202,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             i++
         }
 
-        if(i%10000 == 0) { bg.commit() }
+        if( i % 10000 == 0) { bg.commit() }
 
     })
 

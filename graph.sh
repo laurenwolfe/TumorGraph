@@ -1,5 +1,5 @@
 #!/bin/sh
-docker stop tumorgraph
-docker rm tumorgraph
+docker stop graph
+docker rm graph
 docker build -t lulumialu/tumorgraph .
-docker run -it -p 8182:8182 --name tumorgraph lulumialu/tumorgraph
+docker run -it -p 8182:8182 --name graph lulumialu/tumorgraph
