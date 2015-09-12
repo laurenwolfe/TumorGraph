@@ -75,7 +75,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
     def details = file_iter.split('\\.')
 
     new File(file_iter).eachLine({ final String line ->
-        def id = 0
+        def i = 0
 
         tumor_type = details[0]
         version = details[2]
