@@ -133,7 +133,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 objectID2 = tumor_type + ':miRNA:' + name2
                 break
             default:
-                objectID2 = tumor_type + ':' + feature_type_1 + ':' + name2
+                objectID2 = tumor_type + ':' + feature_type_2 + ':' + name2
                 break
         }
 
@@ -204,8 +204,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
         if( i % 10000 == 0) { bg.commit() }
     })
-    
-    print idList
+
+    print edgeList
 })
 
 g.commit()
