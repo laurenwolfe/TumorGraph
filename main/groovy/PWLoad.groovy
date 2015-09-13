@@ -63,7 +63,7 @@ bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
 //For testing, output count
 edgeList = []
-def vertices  = new HashMap<String,List>()
+def vertices  = new HashMap<String,Object>()
 
 def objectID1
 def objectID2
