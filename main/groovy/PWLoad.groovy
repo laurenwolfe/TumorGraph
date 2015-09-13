@@ -54,16 +54,16 @@ mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompo
 mgmt.commit()
 
 
-//******************//
-//* DATA PROCESSING //
-//*                 //
-//******************//
+//*****************//
+// DATA PROCESSING //
+//                 //
+//*****************//
 
 bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
 //For testing, output count
 edgeList = []
-def vertices  = new HashMap<String,Object>()
+def vertices  = [:]
 
 def objectID1
 def objectID2
@@ -157,7 +157,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             vertices.put(objectID1, v1)
         } else {
-            v1 = vertices.get(objectID1)
+            v1 = vertices[objectID1]
             print "v1: " + v1
         }
 
@@ -179,7 +179,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             vertices.put(objectID2, v2)
         } else {
-            v2 = vertices.get(objectID2)
+            v2 = vertices[objectID2]
         }
 
         if (!edgeList.contains(objectID1 + ":" + objectID2) && (objectID1 != objectID2)) {
