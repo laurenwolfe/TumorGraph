@@ -62,8 +62,9 @@ mgmt.commit()
 bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
 //For testing, output count
-idList = []
 edgeList = []
+def vertices  = [:]
+
 def objectID1
 def objectID2
 
@@ -76,9 +77,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
     new File(file_iter).eachLine({ final String line ->
         def i = 0
-
-        tumor_type = details[0]
-        version = details[2]
 
         //Pull in line from the tsv
         def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
@@ -141,7 +139,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         }
 
         //Does the vertex already exist? If not, create it in the db
-        if (!idList.contains(objectID1)) {
+        if (!vertices.containsKey(objectID1)) {
 
             v1 = bg.addVertex(objectID1)
             v1.setProperty("objectID", objectID1)
@@ -157,15 +155,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             !strand1 ?: v1.setProperty("strand", strand1)
             !annotation1 ?: v1.setProperty("annotation", annotation1)
 
-            idList.add(objectID1);
-
-            i++
+            vertices.put(objectID1, v1)
         } else {
-            v1 = bg.getVertex(objectID1)
-            print "print v1: " + v1
+            v1 = vertices.get(objectID1)
+            print "v1: " + v1
         }
 
-        if (!idList.contains(objectID2)) {
+        if (!vertices.containsKey(objectID2)) {
 
             v2 = bg.addVertex(objectID2)
             v2.setProperty("objectID", objectID2)
@@ -181,16 +177,12 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             !strand2 ?: v2.setProperty("strand", strand2)
             !annotation2 ?: v2.setProperty("annotation", annotation2)
 
-            idList.add(objectID2);
-            i++
+            vertices.put(objectID2, v2)
         } else {
-            print "v2"
-            v2 = bg.getVertex(objectID2)
+            v2 = vertices.get(objectID2)
         }
 
-        if (edgeList.contains(objectID1 + ":" + objectID2)) {
-            print "do nothing"
-        } else {
+        if (!edgeList.contains(objectID1 + ":" + objectID2) && (objectID1 != objectID2)) {
             edge = bg.addEdge(null, v1, v2, "pairwise")
             !correlation ?: edge.setProperty("correlation", correlation)
             !sample_size ?: edge.setProperty("sample_size", sample_size)
@@ -206,10 +198,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             edgeList.add(objectID1 + ":" + objectID2)
             print objectID1 + ":" + objectID2
-            i++
         }
-
-        if( i % 10000 == 0) { bg.commit() }
+        i++
+        if( i % 500 == 0) { bg.commit() }
     })
 })
 
