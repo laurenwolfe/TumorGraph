@@ -203,10 +203,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         }
 
         if( i % 10000 == 0) { bg.commit() }
-
-        print idList
     })
-
+    
+    print idList
 })
 
 g.commit()
