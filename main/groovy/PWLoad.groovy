@@ -63,7 +63,7 @@ bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
 //For testing, output count
 edgeList = []
-def vertices  = [:]
+vertices  = [:]
 
 def objectID1
 def objectID2
@@ -81,9 +81,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         //Pull in line from the tsv
         def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
              min_log_p_unused_a, excluded_sample_count_b, min_log_p_unused_b, genomic_distance) = line.split('\t')
-
-        print "object1: " + object1
-        print "object2: " + object2
 
         //Split bioentity columns into component data
         def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
