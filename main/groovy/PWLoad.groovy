@@ -84,6 +84,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
              min_log_p_unused_a, excluded_sample_count_b, min_log_p_unused_b, genomic_distance) = line.split('\t')
 
+        print "object1: " + object1
+        print "object2: " + object2
+
         //Split bioentity columns into component data
         def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
         def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
@@ -158,8 +161,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             i++
         } else {
-
             v1 = bg.getVertex(objectID1)
+            print "print v1: " + v1
         }
 
         if (!idList.contains(objectID2)) {
@@ -181,10 +184,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             idList.add(objectID2);
             i++
         } else {
+            print "v2"
             v2 = bg.getVertex(objectID2)
         }
 
-        if (!edgeList.contains(objectID1 + ":" + objectID2)) {
+        if (edgeList.contains(objectID1 + ":" + objectID2)) {
+            print "do nothing"
+        } else {
             edge = bg.addEdge(null, v1, v2, "pairwise")
             !correlation ?: edge.setProperty("correlation", correlation)
             !sample_size ?: edge.setProperty("sample_size", sample_size)
@@ -199,13 +205,12 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
 
             edgeList.add(objectID1 + ":" + objectID2)
+            print objectID1 + ":" + objectID2
             i++
         }
 
         if( i % 10000 == 0) { bg.commit() }
     })
-
-    print edgeList
 })
 
 g.commit()
