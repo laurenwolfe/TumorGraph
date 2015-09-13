@@ -1,28 +1,33 @@
 //Query path and string
+//var restURL = "http://glados49:8080/query/index?query=";
+//var restURL = "http://192.168.99.100:8182/graphs/tumorgraph/tp/gremlin?script=";
+//var restURL = "http://192.168.99.100:8080/query/index?query=";
 var restURL = "http://glados49:8080/query/index?query=";
 
 function passedQuery(q) {
-    $.ajax({
-        type: "GET",
-        url: restURL + q,
-        dataType: "json",
-        contentType: "application/json",
-        success: function (json) {
-            if(json) {
-                buildChart(json);
-            } else {
-                alert("Bad request");
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
+
+    var http_request = new XMLHttpRequest();
+
+
+    http_request.onreadystatechange = function(){
+
+        if (http_request.readyState == 4  ){
+            // Javascript function JSON.parse to parse JSON data
+
+            var json = JSON.parse(http_request.responseText);
+
+            buildChart(json);
         }
-    });
+    };
+
+    http_request.open("GET", restURL + q, true);
+    http_request.send();
 }
 
-function buildChart() {
+function buildChart(json) {
+
     var config = {
-        dataSource: graphJSON,
+        dataSource: json,
         linkDistance: function(){ return 10; },
 //        graphHeight: function(){ return 600; },
 //        graphWidth: function(){ return 800; },
@@ -61,7 +66,10 @@ function buildChart() {
             "MIRN": {
                 "color": "#f08080"
             }
-        }
+        }/*,
+        nodeMouseOver: function(node) {
+            return node.name + node.annotation;
+        }*/
     };
 
     alchemy.begin(config);

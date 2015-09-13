@@ -18,8 +18,12 @@ RUN apt-get install -y nano
 COPY /html/ /usr/share/nginx/html/
 COPY /js/ /usr/share/nginx/html/js/
 COPY /css/ /usr/share/nginx/html/css/
+
+RUN rm -v /etc/nginx/nginx.conf
+
 COPY nginx.conf /etc/nginx/nginx.conf
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 EXPOSE 80
 
-CMD nginx -g "daemon off;"
+CMD service nginx start
