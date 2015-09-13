@@ -54,10 +54,10 @@ mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompo
 mgmt.commit()
 
 
-//*****************//
-// DATA PROCESSING //
-//                 //
-//*****************//
+//******************//
+//* DATA PROCESSING //
+//*                 //
+//******************//
 
 bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
@@ -74,6 +74,9 @@ def objectID2
 new File("filenames.tsv").eachLine({ String file_iter ->
 
     def details = file_iter.split('\\.')
+
+    tumor_type = details[0]
+    version = details[2]
 
     new File(file_iter).eachLine({ final String line ->
         def i = 0
@@ -155,7 +158,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             vertices.put(objectID1, v1)
         } else {
             v1 = vertices[objectID1]
-            print "v1: " + v1
         }
 
         if (!vertices.containsKey(objectID2)) {
@@ -194,7 +196,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
 
             edgeList.add(objectID1 + ":" + objectID2)
-            print objectID1 + ":" + objectID2
         }
         i++
         if( i % 500 == 0) { bg.commit() }
