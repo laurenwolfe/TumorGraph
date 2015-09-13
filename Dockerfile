@@ -12,7 +12,7 @@ RUN apt-get update
 RUN apt-get install -y wget unzip
 #RUN echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
 #RUN apt-get install -y oracle-java7-installer wget unzip
-zRUN apt-get install -y default-jre
+RUN apt-get install -y default-jre
 RUN apt-get install -y default-jdk
 
 RUN wget -O /tmp/titan.zip http://s3.thinkaurelius.com/downloads/titan/$TITAN_VER.zip
