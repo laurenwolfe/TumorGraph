@@ -1,8 +1,8 @@
 (function() {
   "Alchemy.js is a graph drawing application for the web.\nCopyright (C) 2014  GraphAlchemist, Inc.\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU Affero General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU Affero General Public License for more details.\n\nYou should have received a copy of the GNU Affero General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.\nlets";
   var Alchemy, Clustering, DrawEdge, DrawEdges, DrawNode, DrawNodes, Editor, EditorInteractions, EditorUtils, Layout, root, warnings,
-    __slice = [].slice,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+      __slice = [].slice,
+      __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Alchemy = (function() {
     function Alchemy(userConf) {
@@ -10,6 +10,8 @@
         userConf = null;
       }
       this.a = this;
+      //*** It exists here, and dynamically loads here, but doesn't hit this function again.
+      //console.log(this);
       this.version = "0.4.1";
       this.get = new this.Get(this);
       this.remove = new this.Remove(this);
@@ -65,6 +67,7 @@
     Alchemy.prototype.begin = function(userConf) {
       var conf;
       conf = this.setConf(userConf);
+
       switch (typeof this.conf.dataSource) {
         case 'string':
           d3.json(this.a.conf.dataSource, this.a.startGraph);
@@ -123,11 +126,15 @@
   Alchemy.prototype.Create = (function() {
     function Create(instance) {
       this.a = instance;
+      //***
+      //console.log(instance);
     }
 
     Create.prototype.nodes = function() {
       var a, n, nodeMap, nodeMaps, registerNode, _i, _len;
       nodeMap = arguments[0], nodeMaps = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      //***
+      //console.log(arguments);
       a = this.a;
       registerNode = function(node) {
         var aNode;
@@ -3158,5 +3165,3 @@
   })();
 
 }).call(this);
-
-//# sourceMappingURL=alchemy.js.map

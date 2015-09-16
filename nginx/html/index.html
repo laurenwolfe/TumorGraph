@@ -13,19 +13,29 @@
 
         <h1 id="mine">Tumor Graph</h1>
 
-        <form id="query-form">
-            <label for="query">Enter query here: </label><input type="text" name="query" id="query" size="60"  />
-            <input type="submit" value="Submit" />
-        </form>
+        <div id="topper">
+            <form id="query-form">
+                <label for="query">Enter query here: </label><input type="text" name="query" id="query" size="60"  />
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+
+        <div id="pop" class="pop">
+            <table id="popup"></table>
+        </div>
+
+        <div id="edgeinfo" class="edgeinfo">
+        </div>
 
         <div class="alchemy" id="alchemy"></div>
 
         <script type="text/javascript">
-
             $('#query-form').submit(function () {
-                passedQuery($('#query').val());
+                passedQuery(encodeURI($('#query').val()));
                 return false;
             });
+
+
 
         </script>
     </body>

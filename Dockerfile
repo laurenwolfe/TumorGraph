@@ -5,7 +5,7 @@ MAINTAINER Lauren Wolfe “lulumialu@gmail.com”
 
 ENV TITAN_VER titan-0.5.4-hadoop2
 
-RUN apt-get install -y software-properties-common
+RUN apt-get install -y --fix-missing software-properties-common
 RUN apt-get install -y --fix-missing python3-software-properties
 #RUN add-apt-repository ppa:webupd8team/java
 RUN apt-get update
@@ -27,7 +27,8 @@ WORKDIR /opt/$TITAN_VER/
 COPY /main/conf/rexster-cassandra-es.xml /opt/$TITAN_VER/conf/
 COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
 COPY /data/filenames.tsv /opt/$TITAN_VER/
-COPY /data/stad.all.16jan15.TP.pwpv /opt/$TITAN_VER/
+#COPY /data/stad.all.17jan15.TP.pwpv /opt/$TITAN_VER/
+COPY brca.seq.20150903_private.TP.pwpv /opt/$TITAN_VER/
 
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan
