@@ -1,7 +1,7 @@
 #Version 0.7
 
 FROM ubuntu:14.04
-MAINTAINER Lauren Wolfe “lulumialu@gmail.com”
+MAINTAINER Lauren Wolfe “wolfela<-A-t->uw<d-o-t>edu”
 
 ENV TITAN_VER titan-0.5.4-hadoop2
 
@@ -26,6 +26,7 @@ COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
 COPY /main/groovy/schema.groovy /opt/$TITAN_VER/
 COPY /main/groovy/loadToExisting.groovy /opt/$TITAN_VER/
 COPY /data/filenames.tsv /opt/$TITAN_VER/
+COPY /data/stad.all.17jan15.TP.pwpv /opt/$TITAN_VER/
 
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan

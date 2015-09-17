@@ -1,6 +1,5 @@
 //Yo! I'm Lauren and I wrote this code.
 
-
 conf = new BaseConfiguration() {
     {
         setProperty("storage.backend", "cassandra")
@@ -66,19 +65,14 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
     def details = file_iter.split('\\.')
 
-    print details
-
     tumor_type = details[0]
     version = details[2]
-
-    print tumor_type
-    print version
 
     new File(file_iter).eachLine({ final String line ->
         //objectID1
         //objectID2
 
-        def i = 0
+        i = 0
 
         //Pull in line from the tsv
         def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
@@ -88,31 +82,31 @@ new File("filenames.tsv").eachLine({ String file_iter ->
         objArr2 = object2.split(':')
 
         if(objArr1.size() == 8) {
-            def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
+            (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
         } else if(objArr1.size() == 7) {
-            def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1) = object1.split(':')
+            (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1) = object1.split(':')
         } else if(objArr1.size() == 6) {
-            def (data_type_1, feature_type_1, name1, chr1, start1, end1) = object1.split(':')
+            (data_type_1, feature_type_1, name1, chr1, start1, end1) = object1.split(':')
         } else if(objArr1.size() == 5) {
-            def (data_type_1, feature_type_1, name1, chr1, start1) = object1.split(':')
+            (data_type_1, feature_type_1, name1, chr1, start1) = object1.split(':')
         } else if(objArr1.size() == 4) {
-            def (data_type_1, feature_type_1, name1, chr1) = object1.split(':')
+            (data_type_1, feature_type_1, name1, chr1) = object1.split(':')
         } else if(objArr1.size() == 3) {
-            def (data_type_1, feature_type_1, name1) = object1.split(':')
+            (data_type_1, feature_type_1, name1) = object1.split(':')
         }
 
         if(objArr2.size() == 8) {
-            def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
+            (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
         } else if(objArr2.size() == 7) {
-            def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2) = object2.split(':')
+            (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2) = object2.split(':')
         } else if(objArr2.size() == 6) {
-            def (data_type_2, feature_type_2, name2, chr2, start2, end2) = object2.split(':')
+            (data_type_2, feature_type_2, name2, chr2, start2, end2) = object2.split(':')
         } else if(objArr1.size() == 5) {
-            def (data_type_2, feature_type_2, name2, chr2, start2) = object2.split(':')
+            (data_type_2, feature_type_2, name2, chr2, start2) = object2.split(':')
         } else if(objArr2.size() == 4) {
-            def (data_type_2, feature_type_2, name2, chr2) = object2.split(':')
+            (data_type_2, feature_type_2, name2, chr2) = object2.split(':')
         } else if(objArr2.size() == 3) {
-            def (data_type_2, feature_type_2, name2) = object2.split(':')
+            (data_type_2, feature_type_2, name2) = object2.split(':')
         }
 
 
@@ -222,7 +216,7 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 v2 = vertices[objectID2]
             }
 
-            if (!edgeList.contains(objectID1 + ":" + objectID2) && (objectID1 != objectID2)) {
+            if ((!edgeList.contains(objectID1 + ":" + objectID2)) && (objectID1 != objectID2)) {
                 //outvertex ---> invertex
                 edge = bg.addEdge(null, v1, v2, "pairwise")
                 !correlation ?: edge.setProperty("correlation", correlation)
@@ -291,7 +285,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             if(feature_type_1 == "RPPA") {
                 proteinID1 = "Protein:" + name1
-                geneProteinID1 = "Gene:" + name1
 
                 //First time we've seen this protein? Create the master protein vertex, link it to matching master gene vertex
                 if(!masterProteinVertices.containsKey(proteinID1)) {
@@ -313,8 +306,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     //*******************************//
 
                     //Does this protein's master gene exist yet? If not, create it.
-                    if(!masterGeneVertices.containsKey(geneProteinID1)) {
-                        geneProteinV1 = bg.addVertex(geneProteinID1)
+                    if(!masterGeneVertices.containsKey(geneID1)) {
+                        geneProteinV1 = bg.addVertex(geneID1)
                         geneProteinV1.setProperty("objectID", geneID1)
                         geneProteinV1.setProperty("name", name1)
                         geneProteinV1.setProperty("type", "gene")
@@ -323,9 +316,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         !end1 ?: geneProteinV1.setProperty("end", end1)
                         !chr1 ?: geneProteinV1.setProperty("chr", chr1)
 
-                        masterGeneVertices.put(geneProteinID1, geneProteinV1)
+                        masterGeneVertices.put(geneID1, geneProteinV1)
                     } else {
-                        geneProteinV1 = masterGeneVertices.get(geneProteinID1)
+                        geneProteinV1 = masterGeneVertices.get(geneID1)
                     }
 
                     //Link master gene to master protein
@@ -340,7 +333,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
             if(feature_type_2 == "RPPA") {
                 proteinID2 = "Protein:" + name2
-                geneProteinID2 = "Gene:" + name2
 
                 if(!masterProteinVertices.containsKey(proteinID2)) {
                     proteinV2 = bg.addVertex(proteinID2)
@@ -361,8 +353,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     //*******************************//
 
                     //Does this protein's master gene exist yet? If not, create it.
-                    if(!masterGeneVertices.containsKey(geneProteinID2)) {
-                        geneProteinV2 = bg.addVertex(geneProteinID2)
+                    if(!masterGeneVertices.containsKey(geneID2)) {
+                        geneProteinV2 = bg.addVertex(geneID2)
                         geneProteinV2.setProperty("objectID", geneID2)
                         geneProteinV2.setProperty("name", name2)
                         geneProteinV2.setProperty("type", "gene")
@@ -371,9 +363,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         !end2 ?: geneProteinV2.setProperty("end", end2)
                         !chr2 ?: geneProteinV2.setProperty("chr", chr2)
 
-                        masterGeneVertices.put(geneProteinID2, geneProteinV2)
+                        masterGeneVertices.put(geneID2, geneProteinV2)
                     } else {
-                        geneProteinV2 = masterGeneVertices.get(geneProteinID2)
+                        geneProteinV2 = masterGeneVertices.get(geneID2)
                     }
 
                     //Link master gene to master protein
@@ -389,7 +381,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             if(feature_type_1 == "METH") {
                 annotSplit1 = annotation1.split('_')
                 probeID1 = "Methylation:" + annotSplit1[0]
-                geneMethID1 = "Gene:" + name1
 
                 //*******************************//
                 // Create Proximal               //
@@ -409,8 +400,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
 
                     masterProbeVertices.put(probeID1, probeV1)
 
-                    if(!masterGeneVertices.containsKey(geneMethID1)) {
-                        geneMethV1 = bg.addVertex(geneMethID1)
+                    if(!masterGeneVertices.containsKey(geneID1)) {
+                        geneMethV1 = bg.addVertex(geneID1)
                         geneMethV1.setProperty("objectID", geneID1)
                         geneMethV1.setProperty("name", name1)
                         geneMethV1.setProperty("type", "gene")
@@ -419,9 +410,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         !end1 ?: geneMethV1.setProperty("end", end1)
                         !chr1 ?: geneMethV1.setProperty("chr", chr1)
 
-                        masterGeneVertices.put(geneMethID1, geneMethV1)
+                        masterGeneVertices.put(geneID1, geneMethV1)
                     } else {
-                        geneMethV1 = masterGeneVertices.get(geneMethID1)
+                        geneMethV1 = masterGeneVertices.get(geneID1)
                     }
 
                     geneMethEdge1 = bg.addEdge(null, geneMethV1, probeV1, "proximal")
@@ -436,7 +427,6 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             if(feature_type_2 == "METH") {
                 annotSplit2 = annotation2.split('_')
                 probeID2 = "Methylation:" + annotSplit2[0]
-                geneMethID2 = "Gene:" + name2
 
                 if(!masterProbeVertices.containsKey(probeID2))  {
                     probeV2 = bg.addVertex(probeID2)
@@ -455,8 +445,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     // MasterGene --> MasterProbe    //
                     //*******************************//
 
-                    if(!masterGeneVertices.containsKey(geneMethID2)) {
-                        geneMethV2 = bg.addVertex(geneMethID2)
+                    if(!masterGeneVertices.containsKey(geneID2)) {
+                        geneMethV2 = bg.addVertex(geneID2)
                         geneMethV2.setProperty("objectID", geneID2)
                         geneMethV2.setProperty("name", name2)
                         geneMethV2.setProperty("type", "gene")
@@ -465,9 +455,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         !end2 ?: geneMethV2.setProperty("end", end2)
                         !chr2 ?: geneMethV2.setProperty("chr", chr2)
 
-                        masterGeneVertices.put(geneMethID2, geneMethV2)
+                        masterGeneVertices.put(geneID2, geneMethV2)
                     } else {
-                        geneMethV2 = masterGeneVertices.get(geneMethID2)
+                        geneMethV2 = masterGeneVertices.get(geneID2)
                     }
 
                     geneMethEdge2 = bg.addEdge(null, geneMethV2, probeV2, "proximal")
@@ -480,9 +470,11 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             }
 
             i++
-            if (i % 100 == 0) {
+//            if (i % 100 == 0) {
                 bg.commit()
-            }
+                println "round number: " + i
+
+//            }
         }
     })
 })
