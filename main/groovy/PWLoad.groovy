@@ -58,7 +58,7 @@ bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
 //Example filename: stad.all.16jan15.TP.pwpv
-new File("pwfiles/filenames.tsv").eachLine({ String file_iter ->
+new File("filenames.tsv").eachLine({ String file_iter ->
 
     //For testing, output count
     edgeList = []
@@ -66,8 +66,13 @@ new File("pwfiles/filenames.tsv").eachLine({ String file_iter ->
 
     def details = file_iter.split('\\.')
 
+    print details
+
     tumor_type = details[0]
     version = details[2]
+
+    print tumor_type
+    print version
 
     new File(file_iter).eachLine({ final String line ->
         //objectID1
@@ -79,9 +84,37 @@ new File("pwfiles/filenames.tsv").eachLine({ String file_iter ->
         def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
              min_log_p_unused_a, excluded_sample_count_b, min_log_p_unused_b, genomic_distance) = line.split('\t')
 
-        //Split bioentity columns into component data
-        def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
-        def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
+        objArr1 = object1.split(':')
+        objArr2 = object2.split(':')
+
+        if(objArr1.size() == 8) {
+            def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
+        } else if(objArr1.size() == 7) {
+            def (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1) = object1.split(':')
+        } else if(objArr1.size() == 6) {
+            def (data_type_1, feature_type_1, name1, chr1, start1, end1) = object1.split(':')
+        } else if(objArr1.size() == 5) {
+            def (data_type_1, feature_type_1, name1, chr1, start1) = object1.split(':')
+        } else if(objArr1.size() == 4) {
+            def (data_type_1, feature_type_1, name1, chr1) = object1.split(':')
+        } else if(objArr1.size() == 3) {
+            def (data_type_1, feature_type_1, name1) = object1.split(':')
+        }
+
+        if(objArr2.size() == 8) {
+            def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
+        } else if(objArr2.size() == 7) {
+            def (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2) = object2.split(':')
+        } else if(objArr2.size() == 6) {
+            def (data_type_2, feature_type_2, name2, chr2, start2, end2) = object2.split(':')
+        } else if(objArr1.size() == 5) {
+            def (data_type_2, feature_type_2, name2, chr2, start2) = object2.split(':')
+        } else if(objArr2.size() == 4) {
+            def (data_type_2, feature_type_2, name2, chr2) = object2.split(':')
+        } else if(objArr2.size() == 3) {
+            def (data_type_2, feature_type_2, name2) = object2.split(':')
+        }
+
 
         //Generate objectIDs by concatenating the tumor type, feature type and gene name
         switch (feature_type_1) {
