@@ -1,5 +1,5 @@
 
-g = TitanFactory.build().set("storage.backend", "cassandra").set("storage.hostname", "127.0.0.1").set("storage.batch-loading", true).open()
+g = TitanFactory.build().set("storage.backend", "cassandra").set("storage.hostname", "localhost").set("storage.batch-loading", true).open()
 
 mgmt = g.getManagementSystem()
 

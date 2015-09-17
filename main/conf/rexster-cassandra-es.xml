@@ -96,6 +96,7 @@
             <properties>
                 <storage.backend>cassandra</storage.backend>
                 <storage.hostname>localhost</storage.hostname>
+                <storage.connection-timeout>100000</storage.connection-timeout>
                 <index.search.backend>elasticsearch</index.search.backend>
                 <storage.buffer-size>1024</storage.buffer-size>
             </properties>
