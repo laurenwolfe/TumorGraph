@@ -58,7 +58,7 @@ bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
 //Example filename: stad.all.16jan15.TP.pwpv
-new File("filenames.tsv").eachLine({ String file_iter ->
+new File("pwfiles/filenames.tsv").eachLine({ String file_iter ->
 
     //For testing, output count
     edgeList = []
