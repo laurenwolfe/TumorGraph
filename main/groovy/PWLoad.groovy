@@ -1,6 +1,6 @@
 //Yo! I'm Lauren and I wrote this code.
 
-/*
+
 conf = new BaseConfiguration() {
     {
         setProperty("storage.backend", "cassandra")
@@ -10,66 +10,43 @@ conf = new BaseConfiguration() {
 }
 
 g = TitanFactory.open(conf)
-*/
-
-g = TitanFactory.build()
-    .set("storage.backend", "cassandra")
-    .set("storage.hostname", "127.0.0.1")
-    .set("storage.batch-loading", true)
-    .open()
-
-
-mgmt = g.getManagementSystem()
-
-//*************************//
-// CREATE DATABASE SCHEMA  //
-//                         //
-//*************************//
-
-//This will be generated as "feature_type:geneId"
-objectID = mgmt.makePropertyKey('objectID').dataType(String.class).make()
-//Type of relationship between vertices -- all pairwise for this batch load script
-pairwise = mgmt.makeEdgeLabel('pairwise').multiplicity(Multiplicity.MULTI).make()
-datasetslice = mgmt.makeEdgeLabel('datasetslice').multiplicity(Multiplicity.MULTI).make()
-proximal = mgmt.makeEdgeLabel('proximal').multiplicity(Multiplicity.MULTI).make()
-codesfor = mgmt.makeEdgeLabel('codesfor').multiplicity(Multiplicity.MULTI).make()
-//Identifies these objects as bioentities, as opposed to drugs or other objects we may add later
-bioentity = mgmt.makeVertexLabel('bioentity').make()
-
-//Vertex properties
-name = mgmt.makePropertyKey('name').dataType(String.class).make()
-chr = mgmt.makePropertyKey('chr').dataType(String.class).make()
-start = mgmt.makePropertyKey('start').dataType(Integer.class).make()
-end = mgmt.makePropertyKey('end').dataType(Integer.class).make()
-strand = mgmt.makePropertyKey('strand').dataType(Character.class).make()
-tumor_type = mgmt.makePropertyKey('tumor_type').dataType(String.class).make()
-version = mgmt.makePropertyKey('version').dataType(String.class).make()
-feature_type = mgmt.makePropertyKey('feature_type').dataType(String.class).make()
-annotation = mgmt.makePropertyKey('annotation').dataType(String.class).make()
-
-
-// See edge-properties.txt for descriptions of these edge properties!
-
-correlation = mgmt.makePropertyKey('correlation').dataType(Decimal.class).make() //3
-sample_size = mgmt.makePropertyKey('sample_size').dataType(Decimal.class).make() //4
-min_log_p_uncorrected = mgmt.makePropertyKey('min_log_p_uncorrected').dataType(Decimal.class).make() //5
-bonferroni = mgmt.makePropertyKey('bonferroni').dataType(Decimal.class).make() //6
-min_log_p_corrected = mgmt.makePropertyKey('min_log_p_corrected').dataType(Decimal.class).make() //7
-excluded_sample_count_a = mgmt.makePropertyKey('excluded_sample_count_a').dataType(Decimal.class).make() //8
-min_log_p_unused_a = mgmt.makePropertyKey('min_log_p_unused_a').dataType(Decimal.class).make() //9
-excluded_sample_count_b = mgmt.makePropertyKey('excluded_sample_count_b').dataType(Decimal.class).make() //10
-min_log_p_unused_b = mgmt.makePropertyKey('min_log_p_unused_b').dataType(Decimal.class).make() //11
-genomic_distance = mgmt.makePropertyKey('genomic_distance').dataType(Decimal.class).make() //12
-feature_types = mgmt.makePropertyKey('feature_types').dataType(String.class).make()
-
-//Create index of ObjectId to speed map building
-mgmt.buildIndex('byObjectID', Vertex.class).addKey(objectID).unique().buildCompositeIndex()
-mgmt.commit()
 
 //Ids, Vertices
 masterGeneVertices = [:]
 masterProteinVertices = [:]
 masterProbeVertices = [:]
+
+//Populate the master maps with any existing vertices
+masterGenes = g.query().has("type", CONTAINS, "gene").vertices()
+
+if(masterGenes.size() > 0) {
+    for (i = 0; i < masterGenes.size(); i++) {
+        v = masterGenes.get(i)
+
+        masterGeneVertices.put(v.objectID, v)
+    }
+}
+
+masterProteins = g.query().has("type", CONTAINS, "protein").vertices()
+
+if(masterProteins.size() > 0) {
+    for (i = 0; i < masterProteins.size(); i++) {
+        v = masterProteins.get(i)
+
+        masterProteinVertices.put(v.objectID, v)
+    }
+}
+
+masterProbes = g.query().has("type", CONTAINS, "probe").vertices()
+
+if(masterProbes.size() > 0) {
+    for (i = 0; i < masterProbes.size(); i++) {
+        v = masterProbes.get(i)
+
+        masterProbeVertices.put(v.objectID, v)
+    }
+}
+
 
 //******************//
 // DATA PROCESSING  //
@@ -83,9 +60,6 @@ bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 //Example filename: stad.all.16jan15.TP.pwpv
 new File("filenames.tsv").eachLine({ String file_iter ->
 
-    objectID1
-    objectID2
-
     //For testing, output count
     edgeList = []
     vertices  = [:]
@@ -96,6 +70,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
     version = details[2]
 
     new File(file_iter).eachLine({ final String line ->
+        //objectID1
+        //objectID2
+
         def i = 0
 
         //Pull in line from the tsv
@@ -166,6 +143,9 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 && feature_type_1 != "CLIN" && feature_type_2 != "CLIN"
                 && feature_type_1 != "SAMP" && feature_type_2 != "SAMP") {
 
+            geneID1 = "Gene:" + name1
+            geneID2 = "Gene:" + name2
+
             //Does the vertex already exist? If not, create it in the db
             if (!vertices.containsKey(objectID1)) {
 
@@ -233,17 +213,18 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             //************************//
 
             if(feature_type_1 == "GNAB" || feature_type_1 == "GEXP" || feature_type_1 == "CNVR") {
-                geneID1 = "Gene:" + name1
-                geneID2 = "Gene:" + name2
 
                 if (!masterGeneVertices.containsKey(geneID1)) {
                     geneV1 = bg.addVertex(geneID1)
                     geneV1.setProperty("objectID", geneID1)
                     geneV1.setProperty("name", name1)
+                    geneV1.setProperty("type", "gene")
 
                     !start1 ?: geneV1.setProperty("start", start1)
                     !end1 ?: geneV1.setProperty("end", end1)
                     !chr1 ?: geneV1.setProperty("chr", chr1)
+
+                    masterGeneVertices.put(geneID1, geneV1)
                 } else {
                     geneV1 = masterGeneVertices.get(geneID1)
                 }
@@ -256,10 +237,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     geneV2 = bg.addVertex(geneID2)
                     geneV2.setProperty("objectID", geneID2)
                     geneV2.setProperty("name", name2)
+                    geneV2.setProperty("type", "gene")
 
                     !start2 ?: geneV2.setProperty("start", start2)
                     !end2 ?: geneV2.setProperty("end", end2)
                     !chr2 ?: geneV2.setProperty("chr", chr2)
+
+                    masterGeneVertices.put(geneID2, geneV2)
                 } else {
                     geneV2 = masterGeneVertices.get(geneID2)
                 }
@@ -281,11 +265,14 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     proteinV1 = bg.addVertex(proteinID1)
                     proteinV1.setProperty("objectID", proteinID1)
                     proteinV1.setProperty("name", name1)
+                    proteinV1.setProperty("type", "protein")
 
                     !start1 ?: proteinV1.setProperty("start", start1)
                     !end1 ?: proteinV1.setProperty("end", end1)
                     !chr1 ?: proteinV1.setProperty("chr", chr1)
                     !strand1 ?: proteinV1.setProperty("strand", strand1)
+
+                    masterProteinVertices.put(proteinID1, proteinV1)
 
                     //*******************************//
                     // Create Codesfor               //
@@ -297,10 +284,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         geneProteinV1 = bg.addVertex(geneProteinID1)
                         geneProteinV1.setProperty("objectID", geneID1)
                         geneProteinV1.setProperty("name", name1)
+                        geneProteinV1.setProperty("type", "gene")
 
                         !start1 ?: geneProteinV1.setProperty("start", start1)
                         !end1 ?: geneProteinV1.setProperty("end", end1)
                         !chr1 ?: geneProteinV1.setProperty("chr", chr1)
+
+                        masterGeneVertices.put(geneProteinID1, geneProteinV1)
                     } else {
                         geneProteinV1 = masterGeneVertices.get(geneProteinID1)
                     }
@@ -323,11 +313,14 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                     proteinV2 = bg.addVertex(proteinID2)
                     proteinV2.setProperty("objectID", proteinID2)
                     proteinV2.setProperty("name", name2)
+                    proteinV2.setProperty("type", "protein")
 
                     !start2 ?: proteinV2.setProperty("start", start2)
                     !end2 ?: proteinV2.setProperty("end", end2)
                     !chr2 ?: proteinV2.setProperty("chr", chr2)
                     !strand2 ?: proteinV2.setProperty("strand", strand2)
+
+                    masterProteinVertices.put(proteinID2, proteinV2)
 
                     //*******************************//
                     // Create Codesfor               //
@@ -339,10 +332,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         geneProteinV2 = bg.addVertex(geneProteinID2)
                         geneProteinV2.setProperty("objectID", geneID2)
                         geneProteinV2.setProperty("name", name2)
+                        geneProteinV2.setProperty("type", "gene")
 
                         !start2 ?: geneProteinV2.setProperty("start", start2)
                         !end2 ?: geneProteinV2.setProperty("end", end2)
                         !chr2 ?: geneProteinV2.setProperty("chr", chr2)
+
+                        masterGeneVertices.put(geneProteinID2, geneProteinV2)
                     } else {
                         geneProteinV2 = masterGeneVertices.get(geneProteinID2)
                     }
@@ -358,8 +354,8 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             }
 
             if(feature_type_1 == "METH") {
-                annotSplit1 = tokenize(annotation1, "_")
-                probeID1 = "Methylation:" + annotSplit1.get(0)
+                annotSplit1 = annotation1.split('_')
+                probeID1 = "Methylation:" + annotSplit1[0]
                 geneMethID1 = "Gene:" + name1
 
                 //*******************************//
@@ -370,21 +366,27 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                 //If we've never seen this probe before, we need to create its vertex and link it to its master gene.
                 if(!masterProbeVertices.containsKey(probeID1))  {
                     probeV1 = bg.addVertex(probeID1)
-                    probeV1.addProperty("objectID", probeID1)
-                    probeV1.addProperty("name", name)
+                    probeV1.setProperty("objectID", probeID1)
+                    probeV1.setProperty("name", name1)
+                    probeV1.setProperty("type", "probe")
 
                     !start1 ?: probeV1.setProperty("start", start1)
                     !end1 ?: probeV1.setProperty("end", end1)
                     !chr1 ?: probeV1.setProperty("chr", chr1)
 
+                    masterProbeVertices.put(probeID1, probeV1)
+
                     if(!masterGeneVertices.containsKey(geneMethID1)) {
                         geneMethV1 = bg.addVertex(geneMethID1)
                         geneMethV1.setProperty("objectID", geneID1)
                         geneMethV1.setProperty("name", name1)
+                        geneMethV1.setProperty("type", "gene")
 
                         !start1 ?: geneMethV1.setProperty("start", start1)
                         !end1 ?: geneMethV1.setProperty("end", end1)
                         !chr1 ?: geneMethV1.setProperty("chr", chr1)
+
+                        masterGeneVertices.put(geneMethID1, geneMethV1)
                     } else {
                         geneMethV1 = masterGeneVertices.get(geneMethID1)
                     }
@@ -399,19 +401,21 @@ new File("filenames.tsv").eachLine({ String file_iter ->
             }
 
             if(feature_type_2 == "METH") {
-                annotSplit2 = tokenize(annotation2, "_")
-                probeID2 = "Methylation:" + annotSplit2.get(0)
+                annotSplit2 = annotation2.split('_')
+                probeID2 = "Methylation:" + annotSplit2[0]
                 geneMethID2 = "Gene:" + name2
-
 
                 if(!masterProbeVertices.containsKey(probeID2))  {
                     probeV2 = bg.addVertex(probeID2)
-                    probeV2.addProperty("objectID", probeID2)
-                    probeV2.addProperty("name", name)
+                    probeV2.setProperty("objectID", probeID2)
+                    probeV2.setProperty("name", name2)
+                    probeV2.setProperty("type", "probe")
 
                     !start2 ?: probeV2.setProperty("start", start2)
                     !end2 ?: probeV2.setProperty("end", end2)
                     !chr2 ?: probeV2.setProperty("chr", chr2)
+
+                    masterProbeVertices.put(probeID2, probeV2)
 
                     //*******************************//
                     // Create Proximal               //
@@ -422,10 +426,13 @@ new File("filenames.tsv").eachLine({ String file_iter ->
                         geneMethV2 = bg.addVertex(geneMethID2)
                         geneMethV2.setProperty("objectID", geneID2)
                         geneMethV2.setProperty("name", name2)
+                        geneMethV2.setProperty("type", "gene")
 
                         !start2 ?: geneMethV2.setProperty("start", start2)
                         !end2 ?: geneMethV2.setProperty("end", end2)
                         !chr2 ?: geneMethV2.setProperty("chr", chr2)
+
+                        masterGeneVertices.put(geneMethID2, geneMethV2)
                     } else {
                         geneMethV2 = masterGeneVertices.get(geneMethID2)
                     }

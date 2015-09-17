@@ -26,9 +26,11 @@ WORKDIR /opt/$TITAN_VER/
 
 COPY /main/conf/rexster-cassandra-es.xml /opt/$TITAN_VER/conf/
 COPY /main/groovy/PWLoad.groovy /opt/$TITAN_VER/
+COPY /main/groovy/schema.groovy /opt/$TITAN_VER/
+COPY /main/groovy/loadToExisting.groovy /opt/$TITAN_VER/
 COPY /data/filenames.tsv /opt/$TITAN_VER/
-#COPY /data/stad.all.17jan15.TP.pwpv /opt/$TITAN_VER/
-COPY brca.seq.20150903_private.TP.pwpv /opt/$TITAN_VER/
+COPY /data/stad.all.17jan15.TP.pwpv /opt/$TITAN_VER/
+#COPY brca.seq.20150903_private.TP.pwpv /opt/$TITAN_VER/
 
 RUN mkdir -p /rexhome/ext/titan
 RUN cp -r /lib/*.* /rexhome/ext/titan
