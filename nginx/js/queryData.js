@@ -2,17 +2,15 @@
 //var restURL = "http://192.168.99.100:8182/graphs/tumorgraph/tp/gremlin?script=";
 //var restURL = "http://192.168.99.100:8080/query/index?query=";
 
-var restURL = "http://glados49:8080/query/index?query=";
+var restURL = "http://192.168.99.100:8080/query/index?query=";
 
 function passedQuery(q) {
 
-    console.log(alchemy);
     $("#alchemy").empty();
     $("#popup").empty();
     $("#edgeinfo").empty();
 
     var http_request = new XMLHttpRequest();
-
 
     http_request.onreadystatechange = function(){
 
@@ -124,22 +122,6 @@ function buildChart(json) {
                 });
             });
         }, nodeClick: function(node) {
-
-            var edgeArrLength = this.dataSource.edges.length;
-            var nodeArrLength = this.dataSource.nodes.length;
-
-            if(edgeArrLength > 0) {
-                for(var i = 0; i < edgeArrLength; i++) {
-                    this.dataSource.edges.shift();
-                }
-            }
-
-            if(nodeArrLength > 0) {
-                for(var i = 0; i < nodeArrLength; i++) {
-                    this.dataSource.nodes.shift();
-                }
-            }
-
             var q = "g.v(" + node.id + ")";
             passedQuery(q);
         }
