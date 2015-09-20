@@ -4,4 +4,4 @@ B:METH:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:CLIP1:chr12:1
 B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:METH:KLHL9:chr9:21329670:21335379:-:code_potential_somatic	0.53	289	6.1	9.8	0.0	0	-0.0	0	-0.0	500000000
 B:GNAB:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:PIK3R4:chr3:130397779:130465673:-:code_potential_somatic	0.55	289	7.0	9.8	0.0	0	-0.0	0	-0.0	500000000
 B:GEXP:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:SLC6A2:chr16:55689516:55740104:+:code_potential_somatic	0.55	289	7.5	9.8	0.0	0	-0.0	0	-0.0	500000000
-B:CNVR:A2ML1:chr12:8975068:9039597:+:code_potential_somatic	B:GNAB:TRAPPC10:chr21:45432200:45526433:+:code_potential_somatic	0.49	289	6.8	9.8	0.0	0	-0.0	0	-0.0	500000000
+B:CLIN:A2ML1:chr12::::	B:SAMP:TRAPPC10:chr21::::	0.49	289	6.8	9.8	0.0	0	-0.0	0	-0.0	500000000

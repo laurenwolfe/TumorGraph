@@ -6,7 +6,7 @@ class Schema {
     //call build: g = schema.make()
     //returns graph object
 
-    def make() {
+    def load() {
         //g = TitanFactory.set("storage.backend", "cassandra").set("storage.hostname", "localhost").open()
 
         def g = TitanFactory.build().set("storage.backend", "cassandra").set("storage.hostname", "localhost").set("storage.batch-loading", true).open()
@@ -26,8 +26,8 @@ class Schema {
         def type = mgmt.makePropertyKey('type').dataType(String.class).make()
         def name = mgmt.makePropertyKey('name').dataType(String.class).make()
         def chr = mgmt.makePropertyKey('chr').dataType(String.class).make()
-        def start = mgmt.makePropertyKey('start').dataType(Integer.class).make()
-        def end = mgmt.makePropertyKey('end').dataType(Integer.class).make()
+        def start = mgmt.makePropertyKey('startPos').dataType(Integer.class).make()
+        def end = mgmt.makePropertyKey('endPos').dataType(Integer.class).make()
         def strand = mgmt.makePropertyKey('strand').dataType(Character.class).make()
         def tumor_type = mgmt.makePropertyKey('tumor_type').dataType(String.class).make()
         def version = mgmt.makePropertyKey('version').dataType(String.class).make()

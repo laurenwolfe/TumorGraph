@@ -1,58 +1,10 @@
 //Yo! I'm Lauren and I wrote this code.
 
-conf = new BaseConfiguration() {
-    {
-        setProperty("storage.backend", "cassandra")
-        setProperty("storage.hostname", "localhost")
-        setProperty("storage.batch-loading", true)
-    }
-}
-
-g = TitanFactory.open(conf)
-
-//Ids, Vertices
-masterGeneVertices = [:]
-masterProteinVertices = [:]
-masterProbeVertices = [:]
-
-//Populate the master maps with any existing vertices
-masterGenes = g.query().has("type", CONTAINS, "gene").vertices()
-
-if(masterGenes.size() > 0) {
-    for (i = 0; i < masterGenes.size(); i++) {
-        v = masterGenes.get(i)
-
-        masterGeneVertices.put(v.objectID, v)
-    }
-}
-
-masterProteins = g.query().has("type", CONTAINS, "protein").vertices()
-
-if(masterProteins.size() > 0) {
-    for (i = 0; i < masterProteins.size(); i++) {
-        v = masterProteins.get(i)
-
-        masterProteinVertices.put(v.objectID, v)
-    }
-}
-
-masterProbes = g.query().has("type", CONTAINS, "probe").vertices()
-
-if(masterProbes.size() > 0) {
-    for (i = 0; i < masterProbes.size(); i++) {
-        v = masterProbes.get(i)
-
-        masterProbeVertices.put(v.objectID, v)
-    }
-}
-
-
 //******************//
 // DATA PROCESSING  //
 //                  //
 //******************//
 
-bg = new BatchGraph(g, VertexIDType.STRING, 10000000)
 
 //Filename will need to be looped here from another file containing filenames and perhaps tumor
 //type (or could just rtrim the tumor type from filenames.)
