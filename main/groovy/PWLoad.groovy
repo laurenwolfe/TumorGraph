@@ -1,434 +1,316 @@
-//Yo! I'm Lauren and I wrote this code.
+class PWLoader {
+    def g
+    def bg
+    def masterGeneVertices
+    def masterProteinVertices
+    def masterProbeVertices
+    int i = 0
+    def vertices
+    def edgeList
 
-//******************//
-// DATA PROCESSING  //
-//                  //
-//******************//
+    def load() {
+        g = openGraph()
 
+        bg = new BatchGraph(g, VertexIDType.STRING, 10000)
+        bg.setVertexIdKey("objectID")
+        bg.setLoadingFromScratch(false)
 
-//Filename will need to be looped here from another file containing filenames and perhaps tumor
-//type (or could just rtrim the tumor type from filenames.)
-//Example filename: stad.all.16jan15.TP.pwpv
-new File("filenames.tsv").eachLine({ String file_iter ->
+        //Lists of master vertices
+        masterGeneVertices = setMasterVertices("gene")
+        masterProteinVertices = setMasterVertices("protein")
+        masterProbeVertices = setMasterVertices("probe")
 
-    //For testing, output count
-    edgeList = []
-    vertices  = [:]
+        processFiles()
 
-    def details = file_iter.split('\\.')
+        bg.commit()
+        g.commit()
+    }
 
-    tumor_type = details[0]
-    version = details[2]
+    def processFiles() {
+        new File("filenames.tsv").eachLine({ String file_iter ->
+            edgeList = []
+            vertices = [:]
+            def details = file_iter.split('\\.')
+            def v1, v2, edge
 
-    new File(file_iter).eachLine({ final String line ->
-        //objectID1
-        //objectID2
+            println "Beginning processing on " + file_iter
 
-        i = 0
+            def tumor_type = details[0]
+            def version = details[2]
 
-        //Pull in line from the tsv
-        def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected, excluded_sample_count_a,
-             min_log_p_unused_a, excluded_sample_count_b, min_log_p_unused_b, genomic_distance) = line.split('\t')
+            new File(file_iter).eachLine({ final String line ->
+                def (object1, object2, correlation, sample_size, min_log_p_uncorrected, bonferroni,
+                     min_log_p_corrected, excluded_sample_count_a, min_log_p_unused_a,
+                     excluded_sample_count_b, min_log_p_unused_b, genomic_distance) = line.split('\t')
 
-        objArr1 = object1.split(':')
-        objArr2 = object2.split(':')
+                def objArr1 = object1.split(':')
+                def objArr2 = object2.split(':')
+                def feature1 = objArr1[1]
+                def feature2 = objArr2[1]
+                def name1 = objArr1[2]
+                def name2 = objArr2[2]
+                def anno1 = "nothing"
+                def anno2 = "nothing"
 
-        if(objArr1.size() == 8) {
-            (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1, annotation1) = object1.split(':')
-        } else if(objArr1.size() == 7) {
-            (data_type_1, feature_type_1, name1, chr1, start1, end1, strand1) = object1.split(':')
-        } else if(objArr1.size() == 6) {
-            (data_type_1, feature_type_1, name1, chr1, start1, end1) = object1.split(':')
-        } else if(objArr1.size() == 5) {
-            (data_type_1, feature_type_1, name1, chr1, start1) = object1.split(':')
-        } else if(objArr1.size() == 4) {
-            (data_type_1, feature_type_1, name1, chr1) = object1.split(':')
-        } else if(objArr1.size() == 3) {
-            (data_type_1, feature_type_1, name1) = object1.split(':')
+                if(objArr1.size() == 8) {
+                    anno1 = objArr1[7]
+                }
+
+                if(objArr2.size() == 8) {
+                    anno2 = objArr2[7]
+                }
+
+                if(feature1 != "CLIN" && feature2 != "CLIN"
+                        && feature1 != "SAMP" && feature2 != "SAMP" &&
+                        !(feature1 == "GNAB" && feature2 == "GNAB" &&
+                                (anno1 == 'code_potential_somatic' || anno2 == 'code_potential_somatic'))) {
+
+                    def objectID1 = makeObjID(feature1, tumor_type, name1)
+                    def objectID2 = makeObjID(feature2, tumor_type, name2)
+
+                    v1 = makeOrGetVertex(objArr1, objectID1, tumor_type, version)
+                    v2 = makeOrGetVertex(objArr2, objectID2, tumor_type, version)
+
+                    if ((!edgeList.contains(objectID1 + ":" + objectID2)) && (objectID1 != objectID2)) {
+                        makeEdge(v1, v2, correlation, sample_size, min_log_p_uncorrected, bonferroni,
+                                min_log_p_corrected, excluded_sample_count_a, min_log_p_unused_a,
+                                excluded_sample_count_b, min_log_p_unused_b, genomic_distance, feature1,
+                                feature2, objectID1, objectID2)
+                    }
+                }
+
+                i++
+
+                println "round: " + i.toString()
+
+                if(i % 100 == 0) {
+                    bg.commit()
+                    println "round number: " + i.toString()
+                }
+            })
+        })
+    }
+
+    def makeMasterGene(geneID, v, label) {
+        def geneV
+
+        if (!masterGeneVertices.containsKey(geneID)) {
+            geneV = bg.addVertex(geneID)
+            geneV.setProperty("objectID", geneID)
+            geneV.setProperty("name", v.name)
+            geneV.setProperty("type", "gene")
+
+            !v.startPos ?: geneV.setProperty("startPos", v.startPos)
+            !v.endPos ?: geneV.setProperty("endPos", v.endPos)
+            !v.chr ?: geneV.setProperty("chr", v.chr)
+
+            masterGeneVertices.put(geneID, geneV)
+        } else {
+            geneV = masterGeneVertices.get(geneID)
         }
 
-        if(objArr2.size() == 8) {
-            (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2, annotation2) = object2.split(':')
-        } else if(objArr2.size() == 7) {
-            (data_type_2, feature_type_2, name2, chr2, start2, end2, strand2) = object2.split(':')
-        } else if(objArr2.size() == 6) {
-            (data_type_2, feature_type_2, name2, chr2, start2, end2) = object2.split(':')
-        } else if(objArr1.size() == 5) {
-            (data_type_2, feature_type_2, name2, chr2, start2) = object2.split(':')
-        } else if(objArr2.size() == 4) {
-            (data_type_2, feature_type_2, name2, chr2) = object2.split(':')
-        } else if(objArr2.size() == 3) {
-            (data_type_2, feature_type_2, name2) = object2.split(':')
+        bg.addEdge(null, geneV, v, label)
+    }
+
+    def makeMasterProtein(proteinID, v) {
+        def proteinV
+
+        if(!masterProteinVertices.containsKey(proteinID)) {
+            proteinV = bg.addVertex(proteinID)
+            proteinV.setProperty("objectID", proteinID)
+            proteinV.setProperty("name", v.name)
+            proteinV.setProperty("type", "protein")
+
+            !v.startPos ?: proteinV.setProperty("startPos", v.startPos)
+            !v.endPos ?: proteinV.setProperty("endPos", v.endPos)
+            !v.chr ?: proteinV.setProperty("chr", v.chr)
+            !v.strand ?: proteinV.setProperty("strand", v.strand)
+
+            masterProteinVertices.put(proteinID, proteinV)
+
+            def geneID = "Gene:" + v.name
+
+            //Make connection between master protein and master gene
+            makeMasterGene(geneID, proteinV, "codesfor")
+
+        } else {
+            //We've already seen this protein, so it's master vertex already exists; grab it.
+            proteinV = masterProteinVertices.get(proteinID)
         }
 
+        bg.addEdge(null, proteinV, v, "datasetslice")
 
-        //Generate objectIDs by concatenating the tumor type, feature type and gene name
-        switch (feature_type_1) {
+    }
+
+    def makeMasterProbe(probeName, v) {
+        def annotSplit = v.annotation.split('_')
+        def probeID = "Methylation:" + annotSplit[0]
+        def probeV
+
+        if(!masterProbeVertices.containsKey(probeID))  {
+            probeV = bg.addVertex(probeID)
+            probeV.setProperty("objectID", probeID)
+            probeV.setProperty("name", v.name)
+            probeV.setProperty("type", "probe")
+
+            !v.startPos ?: probeV.setProperty("startPos", v.startPos)
+            !v.endPos ?: probeV.setProperty("endPos", v.endPos)
+            !v.chr ?: probeV.setProperty("chr", v.chr)
+
+            masterProbeVertices.put(probeID, probeV)
+
+            def geneID = "Gene:" + v.name
+
+            makeMasterGene(geneID, probeV, "proximal")
+
+        } else {
+            probeV = masterProbeVertices.get(probeID)
+        }
+
+        bg.addEdge(null, probeV, v, "datasetslice")
+    }
+
+    def makeEdge(v1, v2, correlation, sample_size, min_log_p_uncorrected, bonferroni, min_log_p_corrected,
+                 excluded_sample_count_a, min_log_p_unused_a, excluded_sample_count_b, min_log_p_unused_b,
+                 genomic_distance, feature_type_1, feature_type_2, objectID1, objectID2) {
+
+        //outvertex ---> invertex
+        def edge = bg.addEdge(null, v1, v2, "pairwise")
+        !correlation ?: edge.setProperty("correlation", correlation)
+        !sample_size ?: edge.setProperty("sample_size", sample_size)
+        !min_log_p_corrected ?: edge.setProperty("min_log_p_corrected", min_log_p_corrected)
+        !min_log_p_uncorrected ?: edge.setProperty("min_log_p_uncorrected", min_log_p_uncorrected)
+        !bonferroni ?: edge.setProperty("bonferroni", bonferroni)
+        !excluded_sample_count_a ?: edge.setProperty("excluded_sample_count_a", excluded_sample_count_a)
+        !min_log_p_unused_a ?: edge.setProperty("min_log_p_unused_a", min_log_p_unused_a)
+        !excluded_sample_count_b ?: edge.setProperty("excluded_sample_count_b", excluded_sample_count_b)
+        !min_log_p_unused_b ?: edge.setProperty("min_log_p_unused_b", min_log_p_unused_b)
+        !genomic_distance ?: edge.setProperty("genomic_distance", genomic_distance)
+
+        edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
+
+        edgeList.add(objectID1 + ":" + objectID2)
+    }
+
+    def makeOrGetVertex(object, objectID, tumor_type, version) {
+        def data_type, feature_type, name, chr, startPos, endPos, strand, annotation, v
+
+        data_type = object[0]
+        feature_type = object[1]
+        name = object[2]
+
+        if (object.size() > 3) {
+            chr = object[3]
+        }
+
+        if(object.size() > 4) {
+            startPos = object[4]
+        }
+
+        if(object.size() > 5) {
+            endPos = object[5]
+        }
+
+        if(object.size() > 6) {
+            strand = object[6]
+        }
+
+        if(object.size() > 7) {
+            annotation = object[7]
+        }
+
+        //Does the vertex already exist? If not, create it in the db
+        if (!vertices.containsKey(objectID)) {
+
+            v = bg.addVertex(objectID)
+            v.setProperty("objectID", objectID)
+            v.setProperty("name", name)
+            v.setProperty("tumor_type", tumor_type)
+            v.setProperty("version", version)
+            v.setProperty("feature_type", feature_type)
+
+            //Some of these may be empty, so let's test for that.
+            !chr ?: v.setProperty("chr", chr)
+            !startPos ?: v.setProperty("startPos", startPos)
+            !endPos ?: v.setProperty("endPos", endPos)
+            !strand ?: v.setProperty("strand", strand)
+            !annotation ?: v.setProperty("annotation", annotation)
+
+            vertices.put(objectID, v)
+
+            //Connect the vertex to its master node
+            if(feature_type == "GNAB" || feature_type == "GEXP" || feature_type == "CNVR") {
+                println "Master Gene"
+                makeMasterGene("Gene:" + name, v, "datasetslice")
+            } else if(feature_type == "RPPA") {
+                println "Master Protein"
+                makeMasterProtein("Protein:" + name, v)
+            } else if(feature_type == "METH") {
+                println "Master Probe"
+                makeMasterProbe("Probe:" + name, v)
+            }
+
+        } else {
+            v = vertices[objectID]
+        }
+
+        return v
+    }
+
+    def makeObjID(feature_type, tumor_type, name) {
+        def objectID
+
+        switch (feature_type) {
             case "GEXB":
-                objectID1 = tumor_type + ':Gene:' + name1
+                objectID = tumor_type + ':Gene:' + name
                 break
             case "GNAB":
-                objectID1 = tumor_type + ':Gene:' + name1
+                objectID = tumor_type + ':Gene:' + name
                 break
             case "CNVR":
-                objectID1 = tumor_type + ':Gene:' + name1
+                objectID = tumor_type + ':Gene:' + name
                 break
             case "RPPA":
-                objectID1 = tumor_type + ':Protein:' + name1
+                objectID = tumor_type + ':Protein:' + name
                 break
             case "METH":
-                objectID1 = tumor_type + ':Methylation:' + name1
+                objectID = tumor_type + ':Methylation:' + name
                 break
             case "MIRN":
-                objectID1 = tumor_type + ':miRNA:' + name1
+                objectID = tumor_type + ':miRNA:' + name
                 break
             default:
-                objectID1 = tumor_type + ':' + feature_type_1 + ':' + name1
+                objectID = tumor_type + ':' + feature_type + ':' + name
                 break
         }
 
-        switch (feature_type_2) {
-            case "GEXB":
-                objectID2 = tumor_type + ':Gene:' + name2
-                break
-            case "GNAB":
-                objectID2 = tumor_type + ':Gene:' + name2
-                break
-            case "CNVR":
-                objectID2 = tumor_type + ':Gene:' + name2
-                break
-            case "RPPA":
-                objectID2 = tumor_type + ':Protein:' + name2
-                break
-            case "METH":
-                objectID2 = tumor_type + ':Methylation:' + name2
-                break
-            case "MIRN":
-                objectID2 = tumor_type + ':miRNA:' + name2
-                break
-            default:
-                objectID2 = tumor_type + ':' + feature_type_2 + ':' + name2
-                break
+        return objectID
+    }
+
+    def setMasterVertices(type) {
+        def masterMap = [:]
+        def masterVertices = g.query().has("type", CONTAINS, type).vertices()
+        def v
+
+        if (masterVertices.size() > 0) {
+            for (i = 0; i < masterVertices.size(); i++) {
+                v = masterVertices.get(i)
+                masterMap.put(v.objectID, v)
+            }
         }
 
-        //******************************//
-        // Create Pairwise Relationship //
-        //                              //
-        //******************************//
+        return masterMap
+    }
 
-        //Filtering excluded feature types
-        if(!(feature_type_1 == "GNAB" && feature_type_2 == "GNAB" &&
-                (annotation1 == 'code_potential_somatic' || annotation2 == 'code_potential_somatic'))
-                && feature_type_1 != "CLIN" && feature_type_2 != "CLIN"
-                && feature_type_1 != "SAMP" && feature_type_2 != "SAMP") {
-
-            geneID1 = "Gene:" + name1
-            geneID2 = "Gene:" + name2
-
-            //Does the vertex already exist? If not, create it in the db
-            if (!vertices.containsKey(objectID1)) {
-
-                v1 = bg.addVertex(objectID1)
-                v1.setProperty("objectID", objectID1)
-                v1.setProperty("name", name1)
-                v1.setProperty("tumor_type", tumor_type)
-                v1.setProperty("version", version)
-                v1.setProperty("feature_type", feature_type_1)
-
-                //Some of these may be empty, so let's test for that.
-                !chr1 ?: v1.setProperty("chr", chr1)
-                !start1 ?: v1.setProperty("start", start1)
-                !end1 ?: v1.setProperty("end", end1)
-                !strand1 ?: v1.setProperty("strand", strand1)
-                !annotation1 ?: v1.setProperty("annotation", annotation1)
-
-                vertices.put(objectID1, v1)
-            } else {
-                v1 = vertices[objectID1]
+    def openGraph() {
+        def conf = new BaseConfiguration() {
+            {
+                setProperty("storage.backend", "cassandra")
+                setProperty("storage.hostname", "localhost")
+                setProperty("storage.batch-loading", true)
             }
-
-            if (!vertices.containsKey(objectID2)) {
-
-                v2 = bg.addVertex(objectID2)
-                v2.setProperty("objectID", objectID2)
-                v2.setProperty("name", name2)
-                v2.setProperty("tumor_type", tumor_type)
-                v2.setProperty("version", version)
-                v2.setProperty("feature_type", feature_type_2)
-
-                //Some of these may be empty, so let's test for that.
-                !chr2 ?: v2.setProperty("chr", chr2)
-                !start2 ?: v2.setProperty("start", start2)
-                !end2 ?: v2.setProperty("end", end2)
-                !strand2 ?: v2.setProperty("strand", strand2)
-                !annotation2 ?: v2.setProperty("annotation", annotation2)
-
-                vertices.put(objectID2, v2)
-            } else {
-                v2 = vertices[objectID2]
-            }
-
-            if ((!edgeList.contains(objectID1 + ":" + objectID2)) && (objectID1 != objectID2)) {
-                //outvertex ---> invertex
-                edge = bg.addEdge(null, v1, v2, "pairwise")
-                !correlation ?: edge.setProperty("correlation", correlation)
-                !sample_size ?: edge.setProperty("sample_size", sample_size)
-                !min_log_p_corrected ?: edge.setProperty("min_log_p_corrected", min_log_p_corrected)
-                !min_log_p_uncorrected ?: edge.setProperty("min_log_p_uncorrected", min_log_p_uncorrected)
-                !bonferroni ?: edge.setProperty("bonferroni", bonferroni)
-                !excluded_sample_count_a ?: edge.setProperty("excluded_sample_count_a", excluded_sample_count_a)
-                !min_log_p_unused_a ?: edge.setProperty("min_log_p_unused_a", min_log_p_unused_a)
-                !excluded_sample_count_b ?: edge.setProperty("excluded_sample_count_b", excluded_sample_count_b)
-                !min_log_p_unused_b ?: edge.setProperty("min_log_p_unused_b", min_log_p_unused_b)
-                !genomic_distance ?: edge.setProperty("genomic_distance", genomic_distance)
-                edge.setProperty("feature_types", feature_type_1 + ':' + feature_type_2)
-
-                edgeList.add(objectID1 + ":" + objectID2)
-            }
-
-            //************************//
-            // Create Datasetslice    //
-            // MasterGene --> subGene //
-            //************************//
-
-            if(feature_type_1 == "GNAB" || feature_type_1 == "GEXP" || feature_type_1 == "CNVR") {
-
-                if (!masterGeneVertices.containsKey(geneID1)) {
-                    geneV1 = bg.addVertex(geneID1)
-                    geneV1.setProperty("objectID", geneID1)
-                    geneV1.setProperty("name", name1)
-                    geneV1.setProperty("type", "gene")
-
-                    !start1 ?: geneV1.setProperty("start", start1)
-                    !end1 ?: geneV1.setProperty("end", end1)
-                    !chr1 ?: geneV1.setProperty("chr", chr1)
-
-                    masterGeneVertices.put(geneID1, geneV1)
-                } else {
-                    geneV1 = masterGeneVertices.get(geneID1)
-                }
-
-                geneEdge1 = bg.addEdge(null, geneV1, v1, "datasetslice")
-            }
-
-            if(feature_type_2 == "GNAB" || feature_type_2 == "GEXP" || feature_type_2 == "CNVR") {
-                if (!masterGeneVertices.containsKey(geneID2)) {
-                    geneV2 = bg.addVertex(geneID2)
-                    geneV2.setProperty("objectID", geneID2)
-                    geneV2.setProperty("name", name2)
-                    geneV2.setProperty("type", "gene")
-
-                    !start2 ?: geneV2.setProperty("start", start2)
-                    !end2 ?: geneV2.setProperty("end", end2)
-                    !chr2 ?: geneV2.setProperty("chr", chr2)
-
-                    masterGeneVertices.put(geneID2, geneV2)
-                } else {
-                    geneV2 = masterGeneVertices.get(geneID2)
-                }
-
-                geneEdge2 = bg.addEdge(null, geneV2, v2, "datasetslice")
-            }
-
-            //*******************************//
-            // Create Datasetslice          //
-            // MasterProtein --> subProtein //
-            //*******************************//
-
-            if(feature_type_1 == "RPPA") {
-                proteinID1 = "Protein:" + name1
-
-                //First time we've seen this protein? Create the master protein vertex, link it to matching master gene vertex
-                if(!masterProteinVertices.containsKey(proteinID1)) {
-                    proteinV1 = bg.addVertex(proteinID1)
-                    proteinV1.setProperty("objectID", proteinID1)
-                    proteinV1.setProperty("name", name1)
-                    proteinV1.setProperty("type", "protein")
-
-                    !start1 ?: proteinV1.setProperty("start", start1)
-                    !end1 ?: proteinV1.setProperty("end", end1)
-                    !chr1 ?: proteinV1.setProperty("chr", chr1)
-                    !strand1 ?: proteinV1.setProperty("strand", strand1)
-
-                    masterProteinVertices.put(proteinID1, proteinV1)
-
-                    //*******************************//
-                    // Create Codesfor               //
-                    // MasterGene --> MasterProtein  //
-                    //*******************************//
-
-                    //Does this protein's master gene exist yet? If not, create it.
-                    if(!masterGeneVertices.containsKey(geneID1)) {
-                        geneProteinV1 = bg.addVertex(geneID1)
-                        geneProteinV1.setProperty("objectID", geneID1)
-                        geneProteinV1.setProperty("name", name1)
-                        geneProteinV1.setProperty("type", "gene")
-
-                        !start1 ?: geneProteinV1.setProperty("start", start1)
-                        !end1 ?: geneProteinV1.setProperty("end", end1)
-                        !chr1 ?: geneProteinV1.setProperty("chr", chr1)
-
-                        masterGeneVertices.put(geneID1, geneProteinV1)
-                    } else {
-                        geneProteinV1 = masterGeneVertices.get(geneID1)
-                    }
-
-                    //Link master gene to master protein
-                    masterProteinGeneEdge1 = bg.addEdge(null, geneProteinV1, proteinV1, "codesfor")
-
-                } else {
-                    //We've already seen this protein, so it's master vertex already exists; grab it.
-                    proteinV1 = masterProteinVertices.get(proteinID1)
-                }
-                proteinEdge1 = bg.addEdge(null, proteinV1, v1, "datasetslice")
-            }
-
-            if(feature_type_2 == "RPPA") {
-                proteinID2 = "Protein:" + name2
-
-                if(!masterProteinVertices.containsKey(proteinID2)) {
-                    proteinV2 = bg.addVertex(proteinID2)
-                    proteinV2.setProperty("objectID", proteinID2)
-                    proteinV2.setProperty("name", name2)
-                    proteinV2.setProperty("type", "protein")
-
-                    !start2 ?: proteinV2.setProperty("start", start2)
-                    !end2 ?: proteinV2.setProperty("end", end2)
-                    !chr2 ?: proteinV2.setProperty("chr", chr2)
-                    !strand2 ?: proteinV2.setProperty("strand", strand2)
-
-                    masterProteinVertices.put(proteinID2, proteinV2)
-
-                    //*******************************//
-                    // Create Codesfor               //
-                    // MasterGene --> MasterProtein  //
-                    //*******************************//
-
-                    //Does this protein's master gene exist yet? If not, create it.
-                    if(!masterGeneVertices.containsKey(geneID2)) {
-                        geneProteinV2 = bg.addVertex(geneID2)
-                        geneProteinV2.setProperty("objectID", geneID2)
-                        geneProteinV2.setProperty("name", name2)
-                        geneProteinV2.setProperty("type", "gene")
-
-                        !start2 ?: geneProteinV2.setProperty("start", start2)
-                        !end2 ?: geneProteinV2.setProperty("end", end2)
-                        !chr2 ?: geneProteinV2.setProperty("chr", chr2)
-
-                        masterGeneVertices.put(geneID2, geneProteinV2)
-                    } else {
-                        geneProteinV2 = masterGeneVertices.get(geneID2)
-                    }
-
-                    //Link master gene to master protein
-                    masterProteinGeneEdge2 = bg.addEdge(null, geneProteinV2, proteinV2, "codesfor")
-
-                } else {
-                    proteinV2 = masterProteinVertices.get(proteinID2)
-                }
-
-                proteinEdge2 = bg.addEdge(null, proteinV2, v2, "datasetslice")
-            }
-
-            if(feature_type_1 == "METH") {
-                annotSplit1 = annotation1.split('_')
-                probeID1 = "Methylation:" + annotSplit1[0]
-
-                //*******************************//
-                // Create Proximal               //
-                // MasterGene --> MasterProbe    //
-                //*******************************//
-
-                //If we've never seen this probe before, we need to create its vertex and link it to its master gene.
-                if(!masterProbeVertices.containsKey(probeID1))  {
-                    probeV1 = bg.addVertex(probeID1)
-                    probeV1.setProperty("objectID", probeID1)
-                    probeV1.setProperty("name", name1)
-                    probeV1.setProperty("type", "probe")
-
-                    !start1 ?: probeV1.setProperty("start", start1)
-                    !end1 ?: probeV1.setProperty("end", end1)
-                    !chr1 ?: probeV1.setProperty("chr", chr1)
-
-                    masterProbeVertices.put(probeID1, probeV1)
-
-                    if(!masterGeneVertices.containsKey(geneID1)) {
-                        geneMethV1 = bg.addVertex(geneID1)
-                        geneMethV1.setProperty("objectID", geneID1)
-                        geneMethV1.setProperty("name", name1)
-                        geneMethV1.setProperty("type", "gene")
-
-                        !start1 ?: geneMethV1.setProperty("start", start1)
-                        !end1 ?: geneMethV1.setProperty("end", end1)
-                        !chr1 ?: geneMethV1.setProperty("chr", chr1)
-
-                        masterGeneVertices.put(geneID1, geneMethV1)
-                    } else {
-                        geneMethV1 = masterGeneVertices.get(geneID1)
-                    }
-
-                    geneMethEdge1 = bg.addEdge(null, geneMethV1, probeV1, "proximal")
-
-                } else {
-                    probeV1 = masterProbeVertices.get(probeID1)
-                }
-
-                probeEdge1 = bg.addEdge(null, probeV1, v1, "datasetslice")
-            }
-
-            if(feature_type_2 == "METH") {
-                annotSplit2 = annotation2.split('_')
-                probeID2 = "Methylation:" + annotSplit2[0]
-
-                if(!masterProbeVertices.containsKey(probeID2))  {
-                    probeV2 = bg.addVertex(probeID2)
-                    probeV2.setProperty("objectID", probeID2)
-                    probeV2.setProperty("name", name2)
-                    probeV2.setProperty("type", "probe")
-
-                    !start2 ?: probeV2.setProperty("start", start2)
-                    !end2 ?: probeV2.setProperty("end", end2)
-                    !chr2 ?: probeV2.setProperty("chr", chr2)
-
-                    masterProbeVertices.put(probeID2, probeV2)
-
-                    //*******************************//
-                    // Create Proximal               //
-                    // MasterGene --> MasterProbe    //
-                    //*******************************//
-
-                    if(!masterGeneVertices.containsKey(geneID2)) {
-                        geneMethV2 = bg.addVertex(geneID2)
-                        geneMethV2.setProperty("objectID", geneID2)
-                        geneMethV2.setProperty("name", name2)
-                        geneMethV2.setProperty("type", "gene")
-
-                        !start2 ?: geneMethV2.setProperty("start", start2)
-                        !end2 ?: geneMethV2.setProperty("end", end2)
-                        !chr2 ?: geneMethV2.setProperty("chr", chr2)
-
-                        masterGeneVertices.put(geneID2, geneMethV2)
-                    } else {
-                        geneMethV2 = masterGeneVertices.get(geneID2)
-                    }
-
-                    geneMethEdge2 = bg.addEdge(null, geneMethV2, probeV2, "proximal")
-
-                } else {
-                    probeV2 = masterProbeVertices.get(probeID2)
-                }
-
-                probeEdge2 = bg.addEdge(null, probeV2, v2, "datasetslice")
-            }
-
-            i++
-//            if (i % 100 == 0) {
-                bg.commit()
-                println "round number: " + i
-
-//            }
         }
-    })
-})
 
-g.commit()
+        return TitanFactory.open(conf)
+    }
+}
