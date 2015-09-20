@@ -11,7 +11,7 @@ class PWLoader {
     def load() {
         g = openGraph()
 
-        bg = new BatchGraph(g, VertexIDType.STRING, 10000)
+        bg = new BatchGraph(g, VertexIDType.STRING, 100000)
         bg.setVertexIdKey("objectID")
         bg.setLoadingFromScratch(false)
 
@@ -81,9 +81,7 @@ class PWLoader {
 
                 i++
 
-                println "round: " + i.toString()
-
-                if(i % 100 == 0) {
+                if(i % 1000 == 0) {
                     bg.commit()
                     println "round number: " + i.toString()
                 }
@@ -240,13 +238,10 @@ class PWLoader {
 
             //Connect the vertex to its master node
             if(feature_type == "GNAB" || feature_type == "GEXP" || feature_type == "CNVR") {
-                println "Master Gene"
                 makeMasterGene("Gene:" + name, v, "datasetslice")
             } else if(feature_type == "RPPA") {
-                println "Master Protein"
                 makeMasterProtein("Protein:" + name, v)
             } else if(feature_type == "METH") {
-                println "Master Probe"
                 makeMasterProbe("Probe:" + name, v)
             }
 
@@ -305,7 +300,7 @@ class PWLoader {
     def openGraph() {
         def conf = new BaseConfiguration() {
             {
-                setProperty("storage.backend", "cassandra")
+                setProperty("storage.backend", "cassandrathrift")
                 setProperty("storage.hostname", "localhost")
                 setProperty("storage.batch-loading", true)
             }

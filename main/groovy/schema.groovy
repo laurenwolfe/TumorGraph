@@ -9,7 +9,7 @@ class Schema {
     def load() {
         //g = TitanFactory.set("storage.backend", "cassandra").set("storage.hostname", "localhost").open()
 
-        def g = TitanFactory.build().set("storage.backend", "cassandra").set("storage.hostname", "localhost").set("storage.batch-loading", true).open()
+        def g = TitanFactory.build().set("storage.backend", "cassandrathrift").set("storage.hostname", "localhost").set("storage.batch-loading", true).open()
         def mgmt = g.getManagementSystem()
         def vProp = makeVertexProperties(mgmt)
         makeEdgeProperties(mgmt)
