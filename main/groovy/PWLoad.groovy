@@ -303,6 +303,7 @@ class PWLoader {
                 setProperty("storage.backend", "cassandrathrift")
                 setProperty("storage.hostname", "localhost")
                 setProperty("storage.batch-loading", true)
+                setProperty("ids.block-size", 100000)
             }
         }
 
